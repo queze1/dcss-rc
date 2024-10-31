@@ -1121,11 +1121,11 @@ local status = {
             self:_update_mons()
             self:_update_threats()
             self:_reissue_warnings()
-            --self:_update_player_warnings()
-            --self:_issue_player_warnings()
-            --self._last_updated = you.turns()
+            self:_update_player_warnings()
+            self:_issue_player_warnings()
+            self._last_updated = you.turns()
         end
-        --self:_maybe_act()
+        self:_maybe_act()
     end, }
 
 local message_log_threat_table = {
@@ -1635,15 +1635,15 @@ end
 
 
 function ready()
-  --AnnounceDamage()
-  --OpenSkills()
+  AnnounceDamage()
+  OpenSkills()
 
-  --AutoQuiver()
-  --ShoutWalkManager()
-  --AutoExcludeUpstairs()
+  AutoQuiver()
+  ShoutWalkManager()
+  AutoExcludeUpstairs()
 
   --threat warning
-  --if DEBUG_YOU_STATUS == true then crawl.mpr(you.status() .. " || " .. you.transform()) end
+  if DEBUG_YOU_STATUS == true then crawl.mpr(you.status() .. " || " .. you.transform()) end
   status:update()
 end
 }
