@@ -1224,7 +1224,7 @@ end
 
 
 -- If an enemy is in LOS while going upstairs, exclude all upstairs in LOS as dangerous before going
-local ignore_exclusions = false
+local ignore_upstair_exclusion = false
 
 function SafeUpstairs()
   -- If not on upstairs, trigger default error message
@@ -1237,12 +1237,12 @@ function SafeUpstairs()
     if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
       if IsEnemyInLOS() then
         travel.set_exclude(c.x, c.y, 2)
+        -- Temporarily ignore "This staircase is marked as excluded" for this turn
+        ignore_upstair_exclusion = true
       end
     end
   end
 
-  -- Temporarily ignore "This staircase is marked as excluded" for this turn
-  ignore_exclusions = true
   crawl.do_commands({"CMD_GO_UPSTAIRS"})
 end
 
@@ -1387,8 +1387,8 @@ function c_answer_prompt(prompt)
     end
 
     -- skip exclusion prompt from SafeUpstairs
-    if prompt:find("Enter next level anyway") and ignore_exclusions then
-      ignore_exclusions = false
+    if prompt:find("Enter next level anyway") and FindMessage("This staircase is marked as excluded", "There is a") and ignore_upstair_exclusion then
+      ignore_upstair_exclusion = false
       return true
     end
 end
