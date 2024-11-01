@@ -1271,6 +1271,8 @@ end
 
 -- Equipment autopickup
 -- Do not pick up duplicates of a dropped non-artifact ring
+-- TODO: Extend drop check to armour, if branded AND (same type as item in inventory AND enchantment is lower) OR (ego has been dropped) then don't pick up
+-- TODO: Extend to weapons too, checking weapon category, if same category then same as previous checks, if diff category only if artifact
 
 -- Resets dropped rings at the start of each game
 if you.turns() == 0 or c_persist.dropped_rings == nil then
