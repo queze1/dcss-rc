@@ -798,7 +798,7 @@ local status = {
              reason = "Petrifier in LOF " .. (check_abil_pct(mons, "Petrify") or "buggy") .. "%, equip more Will?"} ,
         {conditions = {check_abil_pct(mons, "Avatar Song") ~= nil and check_abil_pct(mons, "Avatar Song") > 5},
                tier = 3,
-             reason = "Mesmeriser in LOF " .. (check_abil_pct(mons, "Avatar Song") or "buggy") .. "%, equip more Will?"} ,
+             reason = "Mesmeriser in LOS " .. (check_abil_pct(mons, "Avatar Song") or "buggy") .. "%, equip more Will?"} ,
 	      {conditions = {check(mons, "Blink Allies Encircling"), you.branch() ~= "Zig"},
                tier = 2,
              reason = "Encircling blink in LOS, watch out!"} , }
