@@ -1079,7 +1079,7 @@ end
 -- end helper lua
 
 
--- Hold alt when walking to shout before walking and stop if any monsters shout back
+-- Hold ctrl when walking to shout before walking and stop if any monsters shout back
 local noise_warning = false
 local last_action
 local next_direction
@@ -1136,7 +1136,7 @@ function ShoutWalkManager()
   if last_action == "shout" then
     local message
     local finished = false
-	-- Finds a message with "You hear", stopping when one is found with "for attention"
+	  -- Finds a message with "You hear", stopping when one is found with "for attention"
     local noise_made = FindMessage("You hear", "for attention")
 		
     -- Abort if a noise was made
@@ -1289,16 +1289,18 @@ if you.turns() == 0 or c_persist.dropped_rings == nil then
   c_persist.dropped_rings = {}
 end
 
--- Light (0): 0-4, Medium (1): 5-11, Heavy (2): 12-99
+-- Weightless (0): 0, Light (1-5): 1, Medium (6-11): 2, Heavy (12-99): 3
 function WeightClass(it)
   if it == nil then
     return 0
-  elseif it.encumbrance <= 4 then
+  elseif it.encumbrance == 0 then
     return 0
-  elseif it.encumbrance <= 11 then
+  elseif it.encumbrance <= 5 then
     return 1
-  else
+  elseif it.encumbrance <= 11 then
     return 2
+  else
+    return 3
   end
 end
 
