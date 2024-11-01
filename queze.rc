@@ -979,23 +979,6 @@ function ch_start_running(runmode)
     end
 end
 
-function c_answer_prompt(prompt)
-    -- skip chain lightning and shatter ally prompts when megazigging with death channel
-    if you.branch() == "Zig" and you.status("death channelling") == true then
-        if prompt:find("Chain Lightning might hit") then return true end
-        if prompt:find("Really attack near") then return true end
-    end
-    if prompt:find("Really quaff the potion of lignification") then return true end
-    if prompt:find("Really attack barehanded") then return true end
-    if prompt:find("Shopping list: replace") then return false end
-    if prompt:find("Shopping list: remove") then return false end
-    -- try to prevent the script from becoming stuck in a failed autopickup -> reissue autoexplore loop,
-    -- if it fails to pick something up while adjacent to a closed door
-    if prompt:find("Could not pick up") then
-        force_autoexplore_stop = true
-    end
-end
-
 -- end threat warning lua
 
 
@@ -1016,6 +999,25 @@ function LOSCoords()
 	end
   end
   return coords
+end
+
+-- Helper function returning true if a feature is an upstairs
+function IsUpstair(feature)
+  if feature == nil then
+    return false
+  elseif string.find(feature, "stairs_up") then
+    return true
+  elseif string.find(feature, "escape_hatch_up") then
+    return true
+  elseif string.find(feature, "exit_") then
+    return true
+  end
+  return false
+end
+
+-- Helper function returning true if a feature is a downstairs
+function IsDownstair(feature)
+  return string.find(feature, "stairs_down")
 end
 
 -- Helper function returning true if a hostile creature is in LOS
@@ -1042,20 +1044,6 @@ function IsHealthy()
     return false
   end
   return true
-end
-
--- Helper function returning true if a feature is an upstairs
-function IsUpstair(feature)
-  if feature == nil then
-    return false
-  elseif string.find(feature, "stairs_up") then
-    return true
-  elseif string.find(feature, "escape_hatch_up") then
-    return true
-  elseif string.find(feature, "exit_") then
-    return true
-  end
-  return false
 end
 
 -- Helper function returning true if it's safe to rest
@@ -1225,7 +1213,7 @@ end
 -- Prompts when going downstairs when not full hp/full mp/no magic contamination
 -- TODO: Allow going downstairs when not at full MP when ADead/DChan is applied
 function SafeDownstairs()
-  if not string.find(view.feature_at(0, 0), "stairs_down") then
+  if not IsDownstair(view.feature_at(0, 0)) then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
   elseif IsSafe() then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
@@ -1235,13 +1223,35 @@ function SafeDownstairs()
 end
 
 
--- Excludes all upstairs in LOS if an enemy is in LOS
-function AutoExcludeUpstairs()
+-- If an enemy is in LOS while going upstairs, exclude all upstairs in LOS as dangerous before going
+local ignore_exclusions = false
+
+function SafeUpstairs()
+  -- If not on upstairs, trigger default error message
+  if not IsUpstair(view.feature_at(0, 0)) then
+    crawl.do_commands({"CMD_GO_UPSTAIRS"})
+    return
+  end
+
   for _, c in ipairs(LOSCoords()) do
     if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
       if IsEnemyInLOS() then
         travel.set_exclude(c.x, c.y, 2)
-      else
+      end
+    end
+  end
+
+  -- Temporarily ignore "This staircase is marked as excluded" for this turn
+  ignore_exclusions = true
+  crawl.do_commands({"CMD_GO_UPSTAIRS"})
+end
+
+
+-- Remove all exclusions on upstairs in LOS if no enemy is in LOS
+function RemoveUpstairExclusions()
+  for _, c in ipairs(LOSCoords()) do
+    if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
+      if not IsEnemyInLOS() then
         travel.del_exclude(c.x, c.y)
       end
     end
@@ -1360,12 +1370,36 @@ function DebugAutopickup()
 end
 
 
+function c_answer_prompt(prompt)
+    -- skip chain lightning and shatter ally prompts when megazigging with death channel
+    if you.branch() == "Zig" and you.status("death channelling") == true then
+        if prompt:find("Chain Lightning might hit") then return true end
+        if prompt:find("Really attack near") then return true end
+    end
+    if prompt:find("Really quaff the potion of lignification") then return true end
+    if prompt:find("Really attack barehanded") then return true end
+    if prompt:find("Shopping list: replace") then return false end
+    if prompt:find("Shopping list: remove") then return false end
+    -- try to prevent the script from becoming stuck in a failed autopickup -> reissue autoexplore loop,
+    -- if it fails to pick something up while adjacent to a closed door
+    if prompt:find("Could not pick up") then
+        force_autoexplore_stop = true
+    end
+
+    -- skip exclusion prompt from SafeUpstairs
+    if prompt:find("Enter next level anyway") and ignore_exclusions then
+      ignore_exclusions = false
+      return true
+    end
+end
+
+
 function ready()
   AnnounceDamage()
   OpenSkills()
 
   ShoutWalkManager()
-  AutoExcludeUpstairs()
+  RemoveUpstairExclusions()
 
   --threat warning
   if DEBUG_YOU_STATUS == true then crawl.mpr(you.status() .. " || " .. you.transform()) end
@@ -1641,6 +1675,9 @@ macros += K1 O .
 
 ## downstairs prompt
 macros += M > ===SafeDownstairs
+
+## exclude dangerous upstairs
+macros += M < ===SafeUpstairs
 
 ## autopickup
 macros += M d ===DropItem
