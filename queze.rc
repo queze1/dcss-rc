@@ -782,7 +782,7 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- queze
-	   {conditions = {check_desc(mons, "extra damage"), you.branch() ~= "Zig"},
+	      {conditions = {check_desc(mons, "extra damage"), you.branch() ~= "Zig"},
                tier = 2,
              reason = "Can deal extra damage at range, careful!"} ,
         -- TODO: Warn smite at 50hp or lower
@@ -799,7 +799,7 @@ local status = {
         {conditions = {check_abil_pct(mons, "Avatar Song") ~= nil and check_abil_pct(mons, "Avatar Song") > 5},
                tier = 3,
              reason = "Mesmeriser in LOF " .. (check_abil_pct(mons, "Avatar Song") or "buggy") .. "%, equip more Will?"} ,
-	   {conditions = {check(mons, "Blink Allies Encircling"), you.branch() ~= "Zig"},
+	      {conditions = {check(mons, "Blink Allies Encircling"), you.branch() ~= "Zig"},
                tier = 2,
              reason = "Encircling blink in LOS, watch out!"} , }
 
