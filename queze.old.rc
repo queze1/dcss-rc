@@ -424,6 +424,15 @@ local known_threats = {}
 -- Level 3 alert if that is above your HP, level 2 alert if that is above your HP two times
 
 
+-- Function to split a comma-separated string into a table
+function split_string(input_str, sep)
+    local t = {}
+    for str in string.gmatch(input_str, "([^" .. sep .. "]+)") do
+        table.insert(t, str)
+    end
+    return t
+end
+
 -- Check if an ability exists within the monster's spellbook.
 -- This checks innate/demonic abilities and spells, but cannot check draconian breath abilities.
 -- The third parameter is optional, and tests if the ability deals more than the given damage.
@@ -437,7 +446,8 @@ function check(mons, ability_string, damage)
     books = mons:spells()
     if books ~= nil then
         for _,book in ipairs(books) do
-            for _,spell in ipairs(book) do
+            -- Was a table before, now is a string, guessing that it is comma separated
+            for _,spell in ipairs(split_string(book, ",")) do
                 if spell == ability_string then
                     if damage ~= nil then
                         return check_abil_dam(mons, ability_string) > damage
@@ -841,7 +851,6 @@ local status = {
         if DEBUG_MONS_TARGET_DESC == true then crawl.mpr(mons:name() .. " target_desc: " .. mons:target_desc() ) end
         if DEBUG_LOF_PATH == true then check_lof(mons, "Magic Dart") end
 
-
 -- begin danger table
         -- TODO: Fill out the remaining danger conditions:
         -- Need to finish adding all missing high danger monster spells,
@@ -1003,7 +1012,7 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- queze
-	{conditions = {check_desc(mons, "extra damage"), you.branch() ~= "Zig"},
+	   {conditions = {check_desc(mons, "extra damage"), you.branch() ~= "Zig"},
                tier = 2,
              reason = "Can deal extra damage at range, careful!"} ,
         -- TODO: Warn smite at 50hp or lower
@@ -1020,7 +1029,7 @@ local status = {
         {conditions = {check_abil_pct(mons, "Avatar Song") ~= nil and check_abil_pct(mons, "Avatar Song") > 5},
                tier = 3,
              reason = "Mesmeriser in LOF " .. (check_abil_pct(mons, "Avatar Song") or "buggy") .. "%, equip more Will?"} ,
-	{conditions = {check(mons, "Blink Allies Encircling"), you.branch() ~= "Zig"},
+	   {conditions = {check(mons, "Blink Allies Encircling"), you.branch() ~= "Zig"},
                tier = 2,
              reason = "Encircling blink in LOS, watch out!"} , }
 
@@ -1035,8 +1044,7 @@ local status = {
         -- maybe do the same thing if it's OOD? or tripping any huge damage / rF+++ flags?
         -- TODO: I need to add active status warnings for dangerous player status to this script;
         -- things like petrifying or howl or standing-in-dangerous-cloud or mark
-
-        for _,entry in ipairs(danger_table) do
+        for _, entry in ipairs(danger_table) do
             assert(type(entry.conditions) == "table" and type(entry.tier) == "number" and type(entry.reason) == "string")
         end
 -- end danger table
@@ -1120,12 +1128,12 @@ local status = {
         if self._last_updated == nil or self._last_updated ~= you.turns() then
             self:_update_mons()
             self:_update_threats()
-            self:_reissue_warnings()
-            self:_update_player_warnings()
-            self:_issue_player_warnings()
-            self._last_updated = you.turns()
+            --self:_reissue_warnings()
+            --self:_update_player_warnings()
+            --self:_issue_player_warnings()
+            --self._last_updated = you.turns()
         end
-        self:_maybe_act()
+        --self:_maybe_act()
     end, }
 
 local message_log_threat_table = {

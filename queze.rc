@@ -1,0 +1,1646 @@
+#################################
+# damage announcements messages #
+# HDamage.rc                    #
+# Updated 2016-02-06 57f0e26    #
+#################################
+
+<
+  local previous_hp = 0
+  local previous_mp = 0
+  local previous_form = ""
+  local was_berserk_last_turn = false
+
+  function AnnounceDamage()
+    local current_hp, max_hp = you.hp()
+    local current_mp, max_mp = you.mp()
+    --Things that increase hp/mp temporarily really mess with this
+    local current_form = you.transform()
+    local you_are_berserk = you.berserk()
+    local max_hp_increased = false
+    local max_hp_decreased = false
+
+    if (current_form ~= previous_form) then
+      if (previous_form:find("dragon") or
+          previous_form:find("statue") or
+          previous_form:find("tree") or
+          previous_form:find("ice")) then
+        max_hp_decreased = true
+      elseif (current_form:find("dragon") or
+          current_form:find("statue") or
+          current_form:find("tree") or
+          current_form:find("ice")) then
+        max_hp_increased = true
+      end
+    end
+    if (was_berserk_last_turn and not you_are_berserk) then
+      max_hp_decreased = true
+    elseif (you_are_berserk and not was_berserk_last_turn) then
+      max_hp_increased = true
+    end
+
+    --crawl.mpr(string.format("previous_form is: %s", previous_form))
+    --crawl.mpr(string.format("current_form is: %s", current_form))
+    --crawl.mpr(string.format("max_hp_increased is: %s", max_hp_increased and "True" or "False"))
+    --crawl.mpr(string.format("max_hp_decreased is: %s", max_hp_decreased and "True" or "False"))
+
+    --crawl.mpr(string:format("you_are_berserk is: %s", you_are_berserk and "True" or "False"))
+    --crawl.mpr(string:format("was_berserk_last_turn is: %s", was_berserk_last_turn and "True" or "False"))
+
+
+    --Skips message on initializing game
+    if previous_hp > 0 then
+      local hp_difference = previous_hp - current_hp
+      local mp_difference = previous_mp - current_mp
+
+      if max_hp_increased or max_hp_decreased then
+        if max_hp_increased then
+          crawl.mpr("<green>You now have " .. current_hp .. "/" .. max_hp .. " hp.</green>")
+        else
+          crawl.mpr("<yellow>You now have " .. current_hp .. "/" .. max_hp .. " hp.</yellow>")
+        end
+      else
+        --On losing health
+        if (current_hp < previous_hp) then
+          if current_hp <= (max_hp * 0.30) then
+            crawl.mpr("<red>You take " .. hp_difference .. " damage,</red><lightred> and have " .. current_hp .. "/" .. max_hp .. " hp.</lightred>")
+          elseif current_hp <= (max_hp * 0.50) then
+            crawl.mpr("<red>You take " .. hp_difference .. " damage, and have " .. current_hp .. "/" .. max_hp .. " hp.</red>")
+          elseif current_hp <= (max_hp *  0.70) then
+            crawl.mpr("<red>You take " .. hp_difference .. " damage,</red><yellow> and have " .. current_hp .. "/" .. max_hp .. " hp.</yellow>")
+          elseif current_hp <= (max_hp * 0.90) then
+            crawl.mpr("<red>You take " .. hp_difference .. " damage,</red><lightgrey> and have " .. current_hp .. "/" .. max_hp .. " hp.</lightgrey>")
+          else
+            crawl.mpr("<red>You take " .. hp_difference .. " damage,</red><green> and have " .. current_hp .. "/" .. max_hp .. " hp.</green>")
+          end
+          if hp_difference > (max_hp * 0.20) then
+            crawl.mpr("<lightred>GAME OVER YEAH!!</lightred>")
+          end
+        end
+
+        --On gaining more than 1 health
+        if (current_hp > previous_hp) then
+          --Removes the negative sign
+          local health_inturn = (0 - hp_difference)
+          if (health_inturn > 1) and not (current_hp == max_hp) then
+            if current_hp <= (max_hp * 0.30) then
+              crawl.mpr("<green>You regained " .. health_inturn .. " hp,</green><lightred> and now have " .. current_hp .. "/" .. max_hp .. " hp.</lightred>")
+            elseif current_hp <= (max_hp * 0.50) then
+              crawl.mpr("<green>You regained " .. health_inturn .. " hp,</green><red> and now have " .. current_hp .. "/" .. max_hp .. " hp.</red>")
+            elseif current_hp <= (max_hp *  0.70) then
+              crawl.mpr("<green>You regained " .. health_inturn .. " hp,</green><yellow> and now have " .. current_hp .. "/" .. max_hp .. " hp.</yellow>")
+            elseif current_hp <= (max_hp * 0.90) then
+              crawl.mpr("<green>You regained " .. health_inturn .. " hp,</green><lightgrey> and now have " .. current_hp .. "/" .. max_hp .. " hp.</lightgrey>")
+            else
+              crawl.mpr("<green>You regained " .. health_inturn .. " hp, and now have " .. current_hp .. "/" .. max_hp .. " hp.</green>")
+            end
+          end
+          if (current_hp == max_hp) then
+            crawl.mpr("<green>Health restored: " .. current_hp .. "</green>")
+          end
+        end
+
+        --On gaining more than 1 magic
+        if (current_mp > previous_mp) then
+          --Removes the negative sign
+          local mp_inturn = (0 - mp_difference)
+          if (mp_inturn > 1) and not (current_mp == max_mp) then
+            if current_mp < (max_mp * 0.25) then
+              crawl.mpr("<lightcyan>You regained " .. mp_inturn .. " mp,</lightcyan><red> and now have " .. current_mp .. "/" .. max_mp .. " mp.</red>")
+            elseif current_mp < (max_mp * 0.50) then
+              crawl.mpr("<lightcyan>You regained " .. mp_inturn .. " mp,</lightcyan><yellow> and now have " .. current_mp .. "/" .. max_mp .. " mp.</yellow>")
+            else
+              crawl.mpr("<lightcyan>You regained " .. mp_inturn .. " mp,</lightcyan><green> and now have " .. current_mp .. "/" .. max_mp .. " mp.</green>")
+            end
+          end
+          if (current_mp == max_mp) then
+            crawl.mpr("<lightcyan>MP restored: " .. current_mp .. "</lightcyan>")
+          end
+        end
+
+        --On losing magic
+        if current_mp < previous_mp then
+          if current_mp <= (max_mp / 5) then
+            crawl.mpr("<lightcyan>You now have </lightcyan><red>" .. current_mp .. "/" ..max_mp .." mp.</red>")
+          elseif current_mp <= (max_mp / 2) then
+            crawl.mpr("<lightcyan>You now have </lightcyan><yellow>" .. current_mp .. "/" ..max_mp .." mp.</yellow>")
+          else
+            crawl.mpr("<lightcyan>You now have </lightcyan><green>" .. current_mp .. "/" ..max_mp .." mp.</green>")
+          end
+        end
+      end
+    end
+
+    --Set previous hp/mp and form at end of turn
+    previous_hp = current_hp
+    previous_mp = current_mp
+    previous_form = current_form
+    was_berserk_last_turn = you_are_berserk
+  end
+>
+
+######################################################################
+#                        Custom Lua Functions                        #
+######################################################################
+
+## Threat detection from Implojin
+
+# we dynamically re-set travel_open_doors in multiple places below
+travel_open_doors = avoid
+
+# try to force the game to redraw at minimum ~20fps, to help the player contextualize auto-handler actions
+# redrawing faster than this is probably excessive for online play, even though automated actions can and will occur much faster
+# TODO: Force a redraw and a small delay with every auto-handler action, so the player can see them?
+tile_update_rate = 50
+tile_runrest_rate = 50
+
+# prevent autofight from changing behavior at arbitrary HP threshold
+autofight_stop = 0
+
+# We manually issue HP warnings below, and do not use the game's LOW HITPOINT WARNING
+hp_warning = 0
+
+# flash screen for our scripted danger tier warnings above tier 2
+flash_screen_message += T2
+flash_screen_message += T3
+
+
+{
+-- begin threat warning lua
+local DEBUG_MONS_STATUS = false
+local DEBUG_MONS_FLAGS = false
+local DEBUG_MONS_DESC = false
+local DEBUG_MONS_TARGET_DESC = false
+local DEBUG_LOF_PATH = false
+local DEBUG_THREATS = false
+local DEBUG_ABIL_XDY = false
+local DEBUG_ABIL_DAM = false
+local DEBUG_ABIL_PCT = false
+local DEBUG_YOU_STATUS = false
+
+local ATT_NEUTRAL = 1
+local mons_table = {}
+local current_threats = {}
+local known_threats = {}
+
+-- TODO
+-- Read desc and use regex to get damage information on abilities, attacks
+-- Calculate max possible damage
+  -- Need to pull range out of the desc
+  -- How to determine what attacks do what type of damage
+    -- Copy paste in zap-data.h and regex out the type of damage from there
+	-- Look at fight.cc to see how damage is calculated
+	  -- resist_adjust_damage
+
+-- Level 3 alert if that is above your HP, level 2 alert if that is above your HP two times
+
+
+-- Function to split a comma-separated string into a table
+function split_string(input_str, sep)
+    local t = {}
+    for str in string.gmatch(input_str, "([^" .. sep .. "]+)") do
+        table.insert(t, str)
+    end
+    return t
+end
+
+-- Check if an ability exists within the monster's spellbook.
+-- This checks innate/demonic abilities and spells, but cannot check draconian breath abilities.
+-- The third parameter is optional, and tests if the ability deals more than the given damage.
+-- @param mons mons
+-- @param string ability name
+-- @param number[opt="nil"] damage optional
+-- @return bool
+function check(mons, ability_string, damage)
+    damage = damage or nil
+    local books = nil
+    books = mons:spells()
+    if books ~= nil then
+        for _,book in ipairs(books) do
+            -- Was a table before, now is a string, guessing that it is comma separated
+            for _,spell in ipairs(split_string(book, ",")) do
+                if spell == ability_string then
+                    if damage ~= nil then
+                        return check_abil_dam(mons, ability_string) > damage
+                    else
+                        return true
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
+
+-- lua string.find() returns an index, not a bool, if a pattern match is found,
+-- therefore string.find() comparisons need to include ~= nil
+-- this function is syntactic sugar to help the danger table inlines read a little better
+function check_desc(mons, string)
+    local desc = mons:desc(true)
+    if string.find(desc, string) ~= nil then return true end
+    return false
+end
+
+function check_tdesc(mons, string)
+    local desc = mons:target_desc()
+    if string.find(desc, string) ~= nil then return true end
+    return false
+end
+
+-- Check if a monster description contains a damage string for a given ability.
+-- Returns the damage string if it exists, otherwise nil.
+-- The damage string is typically formatted as "#d#" (ex: 3d23), but is sometimes formatted as "#-#" (Smiting: 7-17),
+-- prefixed with "#x" (CBL: 3x3d25), or postfixed with "*" (LRD: 3d23*).
+-- @param mons mons
+-- @param string ability name
+-- @return string|nil xdy
+function check_abil_xdy(mons, ability)
+    local xdy = nil
+    local desc = mons:desc(true)
+    -- manually fixup ability names that get mangled/chopped by crawl in the mons:desc window
+    if ability == "Lehudib's Crystal Spear" then ability = "Crystal Spear" end
+    if ability == "Lee's Rapid Deconstruction" then ability = "Lee's Rapid Deconst" end
+
+    -- if the ability exists in the full desc,
+    if string.find(desc, ability) ~= nil then
+        -- try to extract "ability string, (optional) whitespace, (optional) <color>, ([ax]x[d-]y*)" from the full desc
+        xdy = string.match(desc, ability .. "%s*" .. "<?%l*>?" .. "%(?%d*x?%d+[d%-]%d+%*?%)?")
+        -- if our pattern exists, try to extract "xdy"
+        if xdy ~= nil then
+            xdy = string.match(xdy, "%d*x?%d+[d%-]%d+")
+            assert(xdy ~= nil)
+        end
+    end
+    if DEBUG_ABIL_XDY then
+        if xdy ~= nil then
+            crawl.mpr(ability .. " xdy: " .. xdy)
+        end
+    end
+    return xdy
+end
+
+-- Check how much damage a monster will deal with an ability.
+-- Returns the maximum possible damage of the ability if we can calculate it, otherwise nil.
+-- @param mons mons
+-- @param string ability name
+-- @return number|nil damage
+function check_abil_dam(mons, ability)
+    local xdy = check_abil_xdy(mons, ability)
+    if xdy == nil then return nil end
+    assert(type(xdy) == "string")
+
+    local damage = nil
+    local dice = {}
+
+    for i in string.gmatch(xdy, "%d+") do
+        table.insert(dice, tonumber(i))
+    end
+    assert(next(dice) ~= nil and #dice >= 2)
+
+    -- most damage formats: "3d23", "3x3d25", "3d23*"
+    if string.find(xdy, "d") ~= nil then
+        local roll = 1
+        for _,die in ipairs(dice) do
+            roll = roll * die
+        end
+        damage = roll
+    -- smiting damage format: "7-17"
+    elseif string.find(xdy, "%-") ~= nil and #dice == 2 then
+        damage = dice[#dice]
+    end
+    -- This assert should trigger for damage formats like "3x7-17", which are unhandled above as they do not currently exist
+    assert(damage ~= nil, "ability damage format unrecognized!")
+    if DEBUG_ABIL_DAM then crawl.mpr(ability .. " damage: " .. tostring(damage)) end
+    return damage
+end
+
+-- Check if a given monster ability has a (percentage) value listed in the monster description.
+-- Returns "percentage" as a string if it exists, otherwise nil.
+-- @param mons mons
+-- @param string ability name
+-- @return string|nil percentage
+function check_abil_pct(mons, ability)
+    local pct = nil
+    local desc = mons:desc(true)
+    -- if the ability exists in the full desc,
+    if string.find(desc, ability) ~= nil then
+        -- try to extract "ability string, whitespace, optional <color>, (decimal%)" from the full desc
+        pct = string.match(desc, ability .. "%s+" .. "<?%l*>?" .. "%(%d+%%%)")
+        -- if our pattern exists, try to extract the decimal
+        if pct ~= nil then
+            pct = tonumber(string.match(pct, "%d+"))
+            if DEBUG_ABIL_PCT then crawl.mpr(ability .. "(%): " .. pct) end
+        end
+    end
+    return pct
+end
+
+local function all_true(table)
+    for _,v in ipairs(table) do
+        if v == nil then return false end
+        if not (v == true) then return false end
+    end
+    return true
+end
+
+local function same_coords(c1x, c1y, c2x, c2y)
+    if c1x == c2x and c1y == c2y then return true end
+    return false
+end
+
+-- test if we have line of fire to this mons
+-- @param mons mons
+-- @param[opt="Magic Dart"] string optional, test LOF using this spell name
+-- @return bool false if LOF is blocked or the spell path to mons is disjoint,
+--              true if spell has clear LOF to mons from the player's position
+function check_lof(mons, spell)
+    local path = nil
+    spell = spell or "Magic Dart"
+    path = spells.path(spell, mons:pos())
+    if path == nil then return false end
+
+    if DEBUG_LOF_PATH == true then
+        crawl.mpr(spell .. " path to " .. mons:name() .. ": ")
+        for _,vertex in ipairs(path) do
+            crawl.mpr(vertex[1] .. "," .. vertex[2])
+        end
+    end
+
+    -- TODO: this test is buggy with Hep ancestors, because they can be fired through, FIXME
+    if not same_coords(path[#path][1], path[#path][2], mons:pos()) then
+        if DEBUG_LOF_PATH == true then crawl.mpr("LOF blocked to " .. mons:name() .. "?") end
+        return false
+    end
+    return true
+end
+
+function debug_mpr_current_threats()
+    crawl.mpr("current_threats : ")
+    for _,entry in ipairs(current_threats) do
+        local pos = {}
+        pos1,pos2 = entry[1]:pos()
+        crawl.mpr("name: " .. entry.name .. " pos(): " .. pos1 .. "," .. pos2)
+    end
+end
+
+function debug_mpr_mons_flags(mons)
+    crawl.mpr(mons:name() .. " flags: ")
+    local flags = {}
+    flags = mons:flags()
+    if next(flags) ~= nil then
+        for _,flag in ipairs(flags) do
+            crawl.mpr(flag .. " | ")
+        end
+    end
+end
+
+-- copied from ff.rc, which used a clua re-implementation of explorer.rare_ood() from /dat/dlua/explorer.dlua
+function check_rare_ood(m)
+    local you_depth = you.depth()
+    local mdepth = m:avg_local_depth()
+    local mprob = m:avg_local_prob()
+    local br_depth = you.depth_fraction()
+    -- explorer.rare_ood() used ood_threshold = math.max(2, you_depth / 3),
+    -- we use a fixed OOD threshold so it doesn't grow later
+    local ood_threshold = 3
+    return mdepth > you_depth + ood_threshold and mprob < 2
+end
+
+-- The conditions here check for torment immunity, not torment resistance.
+-- This function is named and patterned after player::res_torment(), such that I could theoretically
+-- straight up delete this and replace its check with you.res_torment(), if that's ever added.
+function you_res_torment()
+    -- (you.get_mutation_level(MUT_TORMENT_RESISTANCE) >= 2)
+    if you.get_base_mutation_level("torment resistance") >= 2 then
+        return true
+    end
+    -- get_form()->res_neg() == 3
+    -- this appears to be MR_RES_NEG, 3 in form-data.h
+    -- notably, this excludes statue form, as that only provides MR_RES_NEG 1
+    local transform = you.transform()
+    if transform == "death" or transform == "wisp" or transform == "fungus" or transform == "shadow" then
+        return true
+    end
+    -- || you.has_mutation(MUT_VAMPIRISM) && !you.vampire_alive
+    if you.get_base_mutation_level("vampiric") > 0 and you.status("bloodless") == true then
+        return true
+    end
+    -- || you.petrified()
+    -- player::petrified() returns duration[DUR_PETRIFIED]
+    -- this check would appear to be pointless for our purposes, as our script won't be getting turns while petrified,
+    -- but we include it here anyway, for completeness
+    if you.status("petrified") then
+        return true
+    end
+    -- || you.form == transformation::tree
+    if transform == "tree" then
+        return true
+    end
+    -- we do not recreate logic for player_equip_unrand(UNRAND_ETERNAL_TORMENT) here, as it has not generated since 2015
+
+    -- TODO: add partial torment resistance checks, maybe?
+    return false
+end
+
+-- This function is patterned after player::undead_state(), for purpose of checking Dispel Undead vulnerability.
+-- As found in bolt::affect_player_enchantment , all undead states not (you.undead_state() == US_ALIVE) are vulnerable to DU.
+-- @param bool exempt_living_vp
+-- @return bool
+function you_are_undead(exempt_living_vp)
+    assert(type(exempt_living_vp) == "boolean")
+    -- if (form == transformation::death)
+    local transform = you.transform()
+    if transform == "death" then return true end
+    -- return species::undead_type(species);
+    -- it looks like this ultimately returns the undead_type in the species yamls, after a few indirect calls
+    -- ghoul and mummy are US_UNDEAD, vampire is US_SEMI_UNDEAD, grep "undead_type" didn't find any others here.
+    local species = you.race()
+    if species == "Ghoul" or species == "Mummy" then
+        return true
+    end
+    -- If exempt_living_vp is passed as true, we deviate from player::undead_state().
+    -- This is relevant for DU Range and Undeadhunter, which check holiness, which exempts Alive Vp.
+    -- As far as I can tell, mons have no way of casting DU at Alive Vp, even though they would technically take damage from it.
+    if species == "Vampire" then
+        if exempt_living_vp == false then
+            return true
+        elseif exempt_living_vp == true and string.find(you.mutation_overview(), "alive") == nil then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- This function exists to check vulnerability to holy wrath weapons.
+-- player::res_holy_energy() checks player::undead_or_demonic(), which returns undead_state(temp) || species == SP_DEMONSPAWN
+-- Notably, that test does not exempt living vp, so we don't either.
+function you_are_unholy()
+    local species = you.race()
+    if species == "Demonspawn" then return true end
+    return you_are_undead(false)
+end
+
+-- XXX: The logic that sets state for this below is necessarily ill-defined:
+-- Crawl doesn't send any kind of message when it stops autoexplore adjacent to a closed door.
+-- As a result, we have to guard against infinite loops here.
+local reissue_autoexplore_needed = false
+local force_autoexplore_stop = false
+local loop_guard = 0
+local done_exploring = false
+function maybe_reissue_autoexplore()
+    assert(loop_guard < 100, "ASSERT: maybe_reissue_autoexplore() infinite loop detected")
+    crawl.setopt("travel_open_doors = avoid")
+
+    if next(mons_table) ~= nil then
+        reissue_autoexplore_needed = false
+    end
+
+    if done_exploring then
+        reissue_autoexplore_needed = false
+        done_exploring = false
+    end
+
+    if reissue_autoexplore_needed == true then
+        loop_guard = loop_guard + 1
+        crawl.mpr("|| travel_open_doors interrupted explore, reissuing autoexplore.")
+        crawl.setopt("travel_open_doors = open")
+        crawl.sendkeys('o')
+        return true
+    end
+    loop_guard = 0
+    return false
+end
+
+-- Returns true if this mons should be treated as threatening for autotravel, warning, and combat purposes.
+-- This function exists because mons:is_firewood() doesn't cover all such cases.
+-- @param mons mons
+-- @return bool
+function is_threatening(mons)
+    if mons:is_firewood() and mons:name() ~= "briar patch" then return false end
+    if mons:name() == "butterfly" then return false end
+    return mons:attitude() < ATT_NEUTRAL
+end
+
+-- Here we reconstruct the Dream Sheep "Dream Dust" success rate, as it's not exposed anywhere in-game.
+local DREAM_SHEEP_CAP = 6
+local DREAM_SHEEP_MAGIC_NUMBER = 25
+function get_dream_dust_success_rate()
+    local sheep = 0
+    local rate = 0
+
+    for _,mons in ipairs(mons_table) do
+        if check(mons, "Dream Dust") then
+            sheep = sheep + 1
+        end
+    end
+
+    if sheep > DREAM_SHEEP_CAP then sheep = DREAM_SHEEP_CAP end
+    if sheep > 0 then
+        rate = 100 * ((sheep - 1) * DREAM_SHEEP_MAGIC_NUMBER + 1) / (sheep * DREAM_SHEEP_MAGIC_NUMBER)
+    end
+
+    return rate
+end
+
+local pending_message_warnings = {}
+local pending_player_warnings = {}
+
+local HP_WARN_T2_PERCENT = 60
+local HP_WARN_T3_PERCENT = 40
+local LAST_HP = math.huge
+
+function construct_hp_warning()
+    local hp,mhp = you.hp()
+    local threat = nil
+    local percent = math.floor(100 * hp / mhp)
+
+    if next(mons_table) ~= nil and percent <= HP_WARN_T2_PERCENT and hp < LAST_HP then
+        threat = {name = "Low HP Warning", tier = (percent <= HP_WARN_T3_PERCENT and 3 or 2),
+                  reason = ("" .. percent .. "% HP (" .. hp .. "/" .. mhp .. ")"), last_warned = nil}
+    end
+
+    LAST_HP = hp
+    return threat
+end
+
+function update_hp_warning()
+    local threat = construct_hp_warning()
+
+    if threat ~= nil then
+        table.insert(pending_player_warnings, threat)
+    end
+end
+
+local status = {
+    _update_mons = function()
+        local LOS = you.los()
+        local mons = nil
+        mons_table = {}
+
+        for i = -LOS,LOS do
+            for j = -LOS,LOS do
+                mons = monster.get_monster_at(i,j)
+                if mons and you.see_cell_no_trans(i,j) and is_threatening(mons) then
+                    table.insert(mons_table, mons)
+                end
+            end
+        end
+    end,
+    -- returns false if a warning did not occur, true if a warning occurred
+    _warn = function(self,threat,force_more)
+        if force_more == nil then force_more = true end
+        if threat.last_warned ~= nil and threat.last_warned == you.turns() then return false end
+
+        local tier = threat.tier
+        local colour = "yellow"
+        if tier > 1 then colour = "yellow" end
+        if tier > 2 then colour = "lightred" end
+
+        crawl.formatted_mpr("<lightred>Danger: " .. threat.name .. "</lightred> |T" .. tostring(tier) .. "| " ..
+                            "<" .. colour .. ">Reason: " .. threat.reason .. "</" .. colour .. ">")
+        crawl.flush_prev_message()
+
+        -- Tier 2+, flash screen. There is no clua binding to manually perform a flash screen.
+        -- Here, we have to rely on the rcfile flash_screen_message option, pattern matching our (custom) printed tier messages.
+
+        if tier >= 3 and force_more then crawl.more() end
+
+        if tier >=2 then
+            crawl.redraw_screen()
+            crawl.delay(150)
+        end
+
+        threat.last_warned = you.turns()
+        return true
+    end,
+    _check_threat = function(self,mons)
+        -- when in debug mode, print the monster status table to mpr
+        if DEBUG_MONS_STATUS == true then crawl.mpr(mons:name() .. " status: " .. mons:status() ) end
+        if DEBUG_MONS_FLAGS == true then debug_mpr_mons_flags(mons) end
+        if DEBUG_MONS_DESC == true then crawl.mpr(mons:name() .. " desc: " .. mons:desc(true) ) end
+        if DEBUG_MONS_TARGET_DESC == true then crawl.mpr(mons:name() .. " target_desc: " .. mons:target_desc() ) end
+        if DEBUG_LOF_PATH == true then check_lof(mons, "Magic Dart") end
+
+-- begin danger table
+        -- TODO: Fill out the remaining danger conditions:
+        -- Need to finish adding all missing high danger monster spells,
+        -- and also check things that aren't in mons:spells(), like wands, weapons, or monster descriptions
+        -- TODO: add generic string.find(m:desc()) matching catch-all danger conditions,
+        -- to make the script resilient vs. new mons / new spells / unhandled spells
+        -- e.g. string.find(string.lower(m:desc(), "paralys"))
+        -- or string.find(m:desc(), "[pP]aralys")   ??
+        local danger_table = {
+        -- XXX: refactor this table so i'm not duplicating logic (like check_abil_pct) in the conditions and reason fields
+        {conditions = {check_abil_pct(mons, "Paralyse") ~= nil and check_abil_pct(mons, "Paralyse") > 5},
+               tier = 3,
+             reason = "Paralyse " .. (check_abil_pct(mons, "Paralyse") or "buggy") .. "%, equip more Will?"} ,
+        {conditions = {check_abil_pct(mons, "Banishment") ~= nil and check_abil_pct(mons, "Banishment") > 5},
+               tier = 3,
+             reason = "Banishment " .. (check_abil_pct(mons, "Banishment") or "buggy") .. "%, equip more Will?"} ,
+        {conditions = {check_abil_pct(mons, "Sleep") ~= nil and check_abil_pct(mons, "Sleep") > 5},
+               tier = 3,
+             reason = "Sleep " .. (check_abil_pct(mons, "Sleep") or "buggy") .. "%, equip more Will?"} ,
+        {conditions = {check(mons, "Stunning Burst"), you.res_shock() < 1},
+               tier = 3,
+             reason = "Stunning Burst (paralyse) and no rElec"} ,
+        {conditions = {check(mons, "Paralysis Gaze")},
+               tier = 3,
+             reason = "Irresistible Paralysis Gaze (pierces LOF) " .. (mons:status("fully charged") ~= true and "is charging!"
+                                                                       or "is ready to fire!!")} ,
+        {conditions = {check(mons, "Dream Dust")},
+               tier = 2,
+             reason = "Irresistible Dream Dust (" .. get_dream_dust_success_rate() .. "%), watch out!"} ,
+        {conditions = {check_abil_pct(mons, "Confusion Gaze") ~= nil and check_abil_pct(mons, "Confusion Gaze") > 5},
+               tier = 2,
+             reason = "Confusion Gaze " .. (check_abil_pct(mons, "Confusion Gaze") or "buggy") .. "%, equip more Will?"} ,
+        -- XXX: As far as I can tell, the only way to pull attack flavour (AF_WHATEVER) data is
+        -- through string.find(mons:desc()), this doesn't appear to be exposed anywhere else in the clua
+        -- TODO: check against the other attack flavour descriptors to see if there are more that should be handled here
+        -- https://github.com/crawl/crawl/blob/master/crawl-ref/source/describe.cc#L4292
+        {conditions = {check_desc(mons, "Poison and paralysis/slowing"), you.res_poison() < 1},
+               tier = 3,
+             reason = "AF_POISON_PARALYSE and no rPois"} ,
+        -- TODO: Improve this? mons evoke power is 30 + mons.get_hit_dice(); a static will check isn't accurate here,
+        -- but the game also doesn't currently expose mons evoke success% vs. the player anywhere, as far as I can tell.
+        {conditions = {check_tdesc(mons, "wand of paralysis"), you.willpower() < 3},
+               tier = 3,
+             reason = "Wand of Paralysis and low Will"} ,
+        {conditions = {check_abil_pct(mons, "Porkalator") ~= nil and check_abil_pct(mons, "Porkalator") > 5},
+               tier = 2,
+             reason = "Porkalator " .. (check_abil_pct(mons, "Porkalator") or "buggy") .. "%, equip more Will?"} ,
+        {conditions = {check_abil_pct(mons, "Slow") ~= nil and check_abil_pct(mons, "Slow") > 5},
+               tier = 2,
+             reason = "Slow " .. (check_abil_pct(mons, "Slow") or "buggy") .. "%, equip more Will?"} ,
+        {conditions = {check_abil_pct(mons, "Sentinel's Mark") ~= nil and check_abil_pct(mons, "Sentinel's Mark") > 5},
+               tier = 3,
+             reason = "Sentinel's Mark " .. (check_abil_pct(mons, "Sentinel's Mark") or "buggy") .. "%, equip more Will?"} ,
+        -- comparing "distort" instead of "distortion" works against Rift, randarts, and panlord "distorting touch"
+        -- TODO: check to see if this catches dancing weapons?
+        {conditions = {check_tdesc(mons, "[dD]istort"), you.branch() ~= "Zig"},
+               tier = 3,
+             reason = "Distortion weapon!"} ,
+        -- elec weapons: ego, randarts + glaive of the guard + eos + storm bow, arc blade
+        {conditions = {check_tdesc(mons, "of electrocution")
+                       or check_tdesc(mons, "{elec")
+                       or check_tdesc(mons, "arc blade"),
+                       you.res_shock() < 1, you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Electrocution weapon and no rElec!"} ,
+        {conditions = {check_tdesc(mons, "quivering poison"), you.res_poison() < 1, you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Quivering poison darts and no rPois, careful!"} ,
+        {conditions = {check_tdesc(mons, "quivering curare"), you.res_poison() < 1, you.branch() ~= "Zig"},
+               tier = 3,
+             reason = "Quivering curare and no rPois, watch out!!"} ,
+        {conditions = {check_tdesc(mons, "quivering atropa"), you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Quivering atropa, careful!"} ,
+        {conditions = {check_tdesc(mons, "quivering datura"), you.branch() ~= "Zig"},
+               tier = 3,
+             reason = "Quivering datura, careful!"} ,
+        {conditions = {check_tdesc(mons, "quivering dispersal"), you.branch() ~= "Zig"},
+               tier = 3,
+             reason = "Quivering dispersal, careful!"} ,
+        {conditions = {check_tdesc(mons, "throwing net"), you.branch() ~= "Zig"},
+               tier = 3,
+             reason = "Quivering throwing nets, watch out!"} ,
+        -- TODO: branded javelins (silver), branded large rocks (chuck)
+        {conditions = {check_tdesc(mons, "large rock"), you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Quivering large rocks, watch out!!"} ,
+        {conditions = {check_tdesc(mons, "javelin"), you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Quivering javelins, watch out!"} ,
+        {conditions = {check_tdesc(mons, "boomerang"), you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Quivering boomerangs, careful!"} ,
+        {conditions = {check(mons, "Malmutate"), you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Malmutator in LOS"} ,
+        -- XXX: I'd prefer to check lof against "Malmutate" here, but it seems like spells.path() only works with player spells?
+        {conditions = {check(mons, "Malmutate"), check_lof(mons), you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Malmutator in LOF!"} ,
+        {conditions = {mons:name() == "orb of fire", you.res_fire() < 3},
+               tier = 3,
+             reason = "Orb of Fire and low rF"} ,
+        {conditions = {mons:is_unique() == true},
+               tier = 2,
+             reason = "Unique monster, careful!"} ,
+        {conditions = {check_rare_ood(mons)},
+               tier = 2,
+             reason = "OOD monster, careful!"} ,
+
+        {conditions = {mons:name() == "Nikola", you.res_shock() < 1},
+               tier = 3,
+             reason = "Nikola and no rElec"} ,
+        {conditions = {mons:name() == "Nikola", check_tdesc(mons, "[sS]ilenced") ~= true and mons:status("waterlogged") ~= true},
+               tier = 3,
+             reason = "Nikola in LOS and not silenced or waterlogged"} ,
+
+        -- ironbound thunderhulks, lodul
+        {conditions = {check(mons, "Call Down Lightning"), you.res_shock() < 1},
+               tier = 3,
+             reason = "Call Down Lightning and no rElec"} ,
+
+        {conditions = {string.find(mons:name(), "[sS]imulacrum") ~= nil, you.res_cold() < 1},
+               tier = 2,
+             reason = "simulacrum and no rC, careful"} ,
+        {conditions = {string.find(mons:name(), "[sS]imulacrum") ~= nil, string.find(mons:speed_description(), "fast") ~= nil,
+                       you.res_cold() < 1},
+               tier = 3,
+             reason = mons:speed_description() .. " simulacrum and no rC, watch out!!"} ,
+
+        {conditions = {mons:is("ready_to_howl"), you.branch() ~= "Zig",
+                       check_abil_pct(mons, "Doom Howl") ~= nil and check_abil_pct(mons, "Doom Howl") > 5},
+               tier = 3,
+             reason = "Doom Howl " .. (check_abil_pct(mons, "Doom Howl") or "buggy") .. "%, equip more Will or hex it or something"} ,
+        {conditions = {check(mons, "Symbol of Torment"), you_res_torment() ~= true},
+               tier = 3,
+             reason = "Torment and not torment immune!"} ,
+
+        {conditions = {check(mons, "Dispel Undead Range"), you_are_undead(true) == true},
+               tier = 3,
+             reason = "Dispel Undead in LOS while undead!"} ,
+        {conditions = {check_tdesc(mons, "Undeadhunter"), you_are_undead(true) == true},
+               tier = 3,
+             reason = "wielding Undeadhunter while undead, watch out!!"} ,
+        {conditions = {check_tdesc(mons, "holy wrath"), you_are_unholy() == true},
+               tier = 3,
+             reason = "wielding holy wrath while unholy, watch out!!"} ,
+
+        {conditions = {check_tdesc(mons, "carrying a wand")},
+               tier = 2,
+             reason = "carrying a " .. (string.match(mons:target_desc(), "wand of %w+") or "unknown/nonexistent wand?")
+                                    .. ", careful!"} ,
+        -- damnation checks
+        {conditions = {check(mons, "Hurl Damnation")},
+               tier = 2,
+             reason = "Damnation in LOS, careful!"} ,
+        {conditions = {check(mons, "Call Down Damnation")},
+               tier = 2,
+             reason = "Damnation (smite) in LOS, watch out!"} ,
+
+        -- queze
+	   {conditions = {check_desc(mons, "extra damage"), you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Can deal extra damage at range, careful!"} ,
+        -- TODO: Warn smite at 50hp or lower
+        {conditions = {check(mons, "Smiting")},
+               tier = 2,
+             reason = "Smiter in LOS, watch out!"} ,
+        -- In LOF doesn't work with Hep
+        {conditions = {check_abil_pct(mons, "Petrify") ~= nil and check_abil_pct(mons, "Petrify") > 5, not check_lof(mons)},
+               tier = 2,
+             reason = "Petrifier in LOS " .. (check_abil_pct(mons, "Petrify") or "buggy") .. "%, equip more Will?"} ,
+        {conditions = {check_abil_pct(mons, "Petrify") ~= nil and check_abil_pct(mons, "Petrify") > 5, check_lof(mons)},
+               tier = 3,
+             reason = "Petrifier in LOF " .. (check_abil_pct(mons, "Petrify") or "buggy") .. "%, equip more Will?"} ,
+        {conditions = {check_abil_pct(mons, "Avatar Song") ~= nil and check_abil_pct(mons, "Avatar Song") > 5},
+               tier = 3,
+             reason = "Mesmeriser in LOF " .. (check_abil_pct(mons, "Avatar Song") or "buggy") .. "%, equip more Will?"} ,
+	   {conditions = {check(mons, "Blink Allies Encircling"), you.branch() ~= "Zig"},
+               tier = 2,
+             reason = "Encircling blink in LOS, watch out!"} , }
+
+        -- TODO: handle radroach irradiate
+        -- TODO: handle ophan "Holy Flames" vs. unholy/undead player check
+        -- TODO: handle revenant ghostly fireball (rN check)
+        -- TODO: generic "mons carrying randart/unrand check"
+        -- TODO: handle Spit Acid and no rCorr
+        -- TODO: handle Corrosive Bolt and no rCorr
+        -- TODO: look into which other rCorr abilities should be warned
+        -- TODO: "if it's unique, and asleep, and at abs(maxlos) from 0,0", auto set an exclude
+        -- maybe do the same thing if it's OOD? or tripping any huge damage / rF+++ flags?
+        -- TODO: I need to add active status warnings for dangerous player status to this script;
+        -- things like petrifying or howl or standing-in-dangerous-cloud or mark
+        for _, entry in ipairs(danger_table) do
+            assert(type(entry.conditions) == "table" and type(entry.tier) == "number" and type(entry.reason) == "string")
+        end
+-- end danger table
+
+        for _,threat in ipairs(danger_table) do
+            if all_true(threat.conditions) then
+                local needs_warn = true
+                -- if this entry to current_threats matches a known_threats entry, don't warn about it,
+                -- but also delete the matching known_threats entry, so that we can properly warn about duplicate threats.
+                for key,entry in pairs(known_threats) do
+                    if entry.name == mons:name() and entry.reason == threat.reason then
+                        needs_warn = false
+                        table.remove(known_threats, key)
+                        break
+                    end
+                end
+
+                table.insert(current_threats, {name = mons:name(), tier = threat.tier, reason = threat.reason, last_warned = nil})
+                if needs_warn then self:_warn(current_threats[#current_threats]) end
+            end
+        end
+
+    end,
+    _update_threats = function(self)
+        current_threats = {}
+        for _,mons in ipairs(mons_table) do
+            self:_check_threat(mons)
+        end
+        if DEBUG_THREATS == true then debug_mpr_current_threats() end
+
+        -- at the end of each update, replace the known_threats table with the current_threats table
+        known_threats = current_threats
+    end,
+    _reissue_warnings = function(self)
+        for _,threat in ipairs(current_threats) do
+            if threat.tier >= 3 then
+                self:_warn(threat, false)
+            end
+        end
+    end,
+    _issue_message_log_warnings = function(self)
+        for key,warning in ipairs(pending_message_warnings) do
+            self:_warn(warning)
+            table.remove(pending_message_warnings, key)
+        end
+    end,
+    _update_player_warnings = function(self)
+        update_hp_warning()
+    end,
+    _issue_player_warnings = function(self)
+        for key,warning in ipairs(pending_player_warnings) do
+            self:_warn(warning,true)
+            table.remove(pending_player_warnings, key)
+        end
+    end,
+    _maybe_act = function(self)
+-- begin action table
+        local action_table = {
+        -- TODO: auto-id of consumables, to help avoid earlygame unid situations
+        -- TODO: make sure the script autopicks aux items during earlygame
+        -- TODO: let the script handle autopick / autodrop of the usual throwables + evo items
+        { auto = true, handler = maybe_reissue_autoexplore } , }
+-- end action table
+
+        local did_act = nil
+        for _,action in ipairs(action_table) do
+            if action.auto then
+                did_act = action.handler()
+            end
+            if did_act == true then
+                break
+            end
+        end
+        return did_act
+    end,
+    -- ready() can be called multiple times per game turn, if the player takes actions that do not end the turn.
+    -- (e.g. pressing escape, checking inventory with 'i', checking spells with 'I', etc.)
+    -- We don't want the script to rebuild threat tables or reissue warnings if it has already done so this turn,
+    -- therefore, we only take these actions if the game turn has changed.
+    update = function(self)
+        if self._last_updated == nil or self._last_updated ~= you.turns() then
+            self:_update_mons()
+            self:_update_threats()
+            --self:_reissue_warnings()
+            --self:_update_player_warnings()
+            --self:_issue_player_warnings()
+            --self._last_updated = you.turns()
+        end
+        --self:_maybe_act()
+    end, }
+
+local message_log_threat_table = {
+    {conditions = "into a shaft and drop",
+           tier = 3,
+         reason = "Shafted!"} ,
+    {conditions = "You are yanked towards",
+           tier = 3,
+         reason = "Malevolent teleportation!"} , }
+
+-- ch_stop_running preempts(?) c_message, so here we track state, and defer acting on it until the next ready().
+-- TODO: check messages for whether the player was shafted / teleported, and if so, stop reissuing autoexplore?
+-- I don't want the script blindly re-issuing actions if the floor situation has changed.
+function c_message(text, channel)
+    if string.find(text, "Done exploring.") then done_exploring = true end
+    if string.find(text, "Partly explored") then done_exploring = true end
+
+    for _,threat in ipairs(message_log_threat_table) do
+        if string.find(text, threat.conditions) then
+            table.insert(pending_message_warnings, {name = threat.reason, tier = threat.tier, reason = threat.reason, last_warned = nil})
+            status:_issue_message_log_warnings() 
+       end
+    end
+end
+
+-- Does the given feature exist adjacent to the player?
+--
+-- For this, we compare against view.feature_at(x,y),
+-- which returns the second name string in feature-data.h, feature_def feat_defs[],
+-- this is the "vaultname" string that includes underscores.
+--
+-- If ignore_excluded is true, we treat tiles with exclusions as though they do not contain the feature.
+-- @param string "feature_name"
+-- @param bool[opt="false"] ignore_excluded
+-- @return bool
+function check_adjacent_feat(string, ignore_excluded)
+    ignore_excluded = ignore_excluded or false
+    local feature = nil
+    for i = -1,1 do
+        for j = -1,1 do
+            feature = view.feature_at(i,j)
+            if feature == string then
+                if ignore_excluded == true and travel.is_excluded(i,j) == true then
+                    -- do nothing, continue the loop
+                else
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+-- Note: We can't print messages to mpr from ch_stop_running().
+-- XXX: Messages here appear to print to the log *before* the c_message() hook is called, which appears
+-- to preempt that hook, breaking the underlying assumption that it's being called for each message. (???)
+function ch_stop_running(runmode)
+    reissue_autoexplore_needed = false
+    -- These conditions test if our autoexplore was interrupted early due to travel_open_doors = avoid.
+    -- XXX: This check is imperfect, and is likely to send the script into infinite autoexplore loops.
+    -- I've added an assert and some harder checks to maybe_reissue_autoexplore(), but this could still be improved.
+    if runmode == "explore_greedy" and check_adjacent_feat("closed_door", true)
+       and you.feel_safe() and force_autoexplore_stop == false then
+           reissue_autoexplore_needed = true
+    end
+end
+
+-- "travel_open_doors = avoid" ordinarily causes problems with closed doors and interlevel travel.
+-- This permits autotravel to open doors that are in the way, when issuing G> and X> commands.
+function ch_start_running(runmode)
+    if runmode == "intertravel" then
+        crawl.setopt("travel_open_doors = open")
+    end
+end
+
+function c_answer_prompt(prompt)
+    -- skip chain lightning and shatter ally prompts when megazigging with death channel
+    if you.branch() == "Zig" and you.status("death channelling") == true then
+        if prompt:find("Chain Lightning might hit") then return true end
+        if prompt:find("Really attack near") then return true end
+    end
+    if prompt:find("Really quaff the potion of lignification") then return true end
+    if prompt:find("Really attack barehanded") then return true end
+    if prompt:find("Shopping list: replace") then return false end
+    if prompt:find("Shopping list: remove") then return false end
+    -- try to prevent the script from becoming stuck in a failed autopickup -> reissue autoexplore loop,
+    -- if it fails to pick something up while adjacent to a closed door
+    if prompt:find("Could not pick up") then
+        force_autoexplore_stop = true
+    end
+end
+
+-- end threat warning lua
+
+
+-- begin helper lua
+
+-- Helper function calculating distance from player
+function DistToPlayer(x, y)
+  return math.abs(x) + math.abs(y)
+end
+
+-- Helper function generating all coords in LOS
+function LOSCoords()
+  local x, y
+  local coords = {}
+  for x = -you.los(), you.los() do
+    for y = -you.los(), you.los() do
+	  table.insert(coords, {x = x, y = y})
+	end
+  end
+  return coords
+end
+
+-- Helper function returning true if a hostile creature is in LOS
+function IsEnemyInLOS()
+  for _, c in ipairs(LOSCoords()) do
+    m = monster.get_monster_at(c.x, c.y)
+    -- 0 = hostile, 1 = neutral, 2 = friendly
+    if m and m:attitude() < 1 and not m:is_safe() then
+      return true
+    end
+  end
+  return false
+end
+
+-- Helper function returning true if you are completely rested
+function IsHealthy()
+  hp, mhp = you.hp()
+  mp, mmp = you.mp()
+  if hp < mhp then
+    return false
+  elseif mp < mmp then
+    return false
+  elseif you.contaminated() ~= 0 then
+    return false
+  end
+  return true
+end
+
+-- Helper function returning true if a feature is an upstairs
+function IsUpstair(feature)
+  if feature == nil then
+    return false
+  elseif string.find(feature, "stairs_up") then
+    return true
+  elseif string.find(feature, "escape_hatch_up") then
+    return true
+  elseif string.find(feature, "exit_") then
+    return true
+  end
+  return false
+end
+
+-- Helper function returning true if it's safe to rest
+function IsSafe()
+  local feature = view.feature_at(0, 0)
+  hp, mhp = you.hp()
+  mp, mmp = you.mp()
+  if IsUpstair(feature) then
+    return true
+  end
+  return IsHealthy()
+end
+
+-- Helper function which finds a message in the buffer which contains a pattern
+-- If a message matches the stop pattern, then return nil
+function FindMessage(match, stop)
+  local counter = 1
+  -- Check at most 100 messages
+  while (counter < 100)
+  do
+    message = crawl.messages(counter)
+    counter = counter + 1
+
+    if string.find(message, match) then
+      return message
+    end
+    if string.find(message, stop) then
+      return
+    end
+  end
+end
+
+-- end helper lua
+
+
+-- Hold alt when walking to shout before walking and stop if any monsters shout back
+local noise_warning = false
+local last_action
+local next_direction
+local direction_to_coord = {["y"]={-1, -1},
+                            ["u"]={1, -1},
+                            ["h"]={-1, 0},
+                            ["b"]={-1, 1},
+                            ["n"]={1, 1},
+                            ["j"]={0, 1},
+                            ["k"]={0, -1},
+                            ["l"]={1, 0}}
+
+-- Creates a shout walk function for a direction
+-- Shouts, then sets up the states for ShoutWalkManager
+function ShoutWalkCreator(direction)
+  return function()
+    -- Do not shout walk if monsters are in LOS.
+    if IsEnemyInLOS() then
+      crawl.mpr("There are monsters nearby!", 5)
+      return
+    end
+    -- If a monster has made a noise in the last shout walk,
+    -- prompt whether to shout walk anyway
+    if noise_warning then
+      if not crawl.yesno("Your last walk was canceled because a monster made a noise. Continue anyway?") then
+        return
+      end
+    end
+
+    -- Shout, then set last_action to shout and set the walking direction
+    crawl.sendkeys("tt")
+    last_action = "shout"
+    next_direction = direction
+  end
+end
+
+-- Manages the state tracking
+function ShoutWalkManager()
+  -- Reset the noise warning at the start of every turn
+  noise_warning = false
+  
+  if not last_action then
+    return
+  end
+
+  -- Abort if an enemy is in LOS
+  if IsEnemyInLOS() then
+    crawl.mpr("A monster has walked into LOS. Walk canceled.", 3)
+	last_action = nil
+    return
+  end
+
+  -- If last action was shouting, then attempt to walk
+  if last_action == "shout" then
+    local message
+    local finished = false
+	-- Finds a message with "You hear", stopping when one is found with "for attention"
+    local noise_made = FindMessage("You hear", "for attention")
+		
+    -- Abort if a noise was made
+    if noise_made then
+      crawl.mpr("A noise has been made in response. Walk canceled.", 3)
+      noise_warning = true
+      last_action = nil
+      return
+    end
+	
+    -- Abort if path is blocked
+    -- local x, y = direction_to_coord[next_direction][1], direction_to_coord[next_direction][2]
+	
+    -- Abort if path is interrupted
+
+    -- Walk and set last_action
+    crawl.sendkeys(next_direction)
+    -- add terrain check
+    --last_action = "walk"
+    last_action = nil
+   
+  -- If last_action is walk, then shout
+  elseif last_action == "walk" then
+    -- crawl.sendkeys("tt")
+    -- last_action = "shout"
+    return
+  end
+end
+
+function ShoutWalkMapper()
+  shout_walk_y = ShoutWalkCreator("y")
+  shout_walk_u = ShoutWalkCreator("u")
+  shout_walk_h = ShoutWalkCreator("h")
+  shout_walk_b = ShoutWalkCreator("b")
+  shout_walk_n = ShoutWalkCreator("n")
+  shout_walk_j = ShoutWalkCreator("j")
+  shout_walk_k = ShoutWalkCreator("k")
+  shout_walk_l = ShoutWalkCreator("l")
+end
+
+-- Set up shout walk functions
+ShoutWalkMapper()
+
+
+-- Safe exploring
+local retreated = false
+function SafeExplore()
+  -- Do not allow exploring if you have a sentinel's mark
+  -- Not sure why you.status() doesn't work
+  if FindMessage("mark forms upon you", "mark upon you fades away") then
+    crawl.mpr("<lightred>A sentinel's mark is upon you!<lightred>")
+	
+  elseif IsSafe() or retreated then
+    -- Links to reissue autoexplore code
+    crawl.setopt("travel_open_doors = avoid")
+    force_autoexplore_stop = false
+    crawl.do_commands({"CMD_EXPLORE"})
+    retreated = false
+  
+  -- If you are not safe, then prompt to retreat
+  else
+    retreated = true
+  
+    for _, c in ipairs(LOSCoords()) do
+      if IsUpstair(view.feature_at(c.x, c.y)) then
+	    crawl.sendkeys("X<")
+		return
+	  end
+	end  
+    crawl.sendkeys("X")
+  end
+end
+
+-- Prompts when going downstairs when not full hp/full mp/no magic contamination
+-- TODO: Allow going downstairs when not at full MP when ADead/DChan is applied
+function SafeDownstairs()
+  if not string.find(view.feature_at(0, 0), "stairs_down") then
+    crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+  elseif IsSafe() then
+    crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+  elseif crawl.yesno("Really go downstairs while injured?") then
+    crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+  end
+end
+
+
+-- Excludes all upstairs in LOS if an enemy is in LOS
+function AutoExcludeUpstairs()
+  for _, c in ipairs(LOSCoords()) do
+    if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
+      if IsEnemyInLOS() then
+        travel.set_exclude(c.x, c.y, 2)
+      else
+        travel.del_exclude(c.x, c.y)
+      end
+    end
+  end
+end
+
+
+-- Repurpose (w)ield for spellcasting, but only for felids
+function FelidZF()
+  if you.race() == "Felid" then
+    crawl.sendkeys("zf")
+  else
+    crawl.do_commands({"CMD_WIELD_WEAPON"})
+  end
+end
+
+
+-- Opens skill menu at the beginning of the game
+local need_skills_opened = true
+function OpenSkills()
+  if you.turns() == 0 and need_skills_opened then
+    need_skills_opened = false
+    crawl.sendkeys("m")
+  end
+end
+
+
+-- Equipment autopickup
+-- Do not pick up duplicates of a dropped non-artifact ring
+
+-- Resets dropped rings at the start of each game
+if you.turns() == 0 or c_persist.dropped_rings == nil then
+  c_persist.dropped_rings = {}
+end
+
+-- Light (0): 0-4, Medium (1): 5-11, Heavy (2): 12-99
+function WeightClass(it)
+  if it == nil then
+    return 0
+  elseif it.encumbrance <= 4 then
+    return 0
+  elseif it.encumbrance <= 11 then
+    return 1
+  else
+    return 2
+  end
+end
+
+-- None: 0, Plain: 1, Branded: 2, Artifact: 3
+function RarityClass(it)
+  if it == nil then
+    return 0
+  elseif it.artifact then
+    return 3
+  elseif it.branded then
+    return 2
+  else
+    return 1
+  end
+end
+
+function autopickup(it, name)
+  if it.is_useless then
+    return
+  end
+  
+  local class = it:class(true)
+  if class == "Armour" then
+    local cur = items.equipped_at(it.equip_type)
+
+    -- Pickup armour of the same weight class, if it has equal or higher rarity
+    local equal_weight = WeightClass(it) == WeightClass(cur)
+    local greater_rarity = RarityClass(it) >= RarityClass(cur)
+    if equal_weight and greater_rarity then
+      return true
+    end
+  elseif class == "Jewellery" and c_persist.dropped_rings[it:ego()] ~= nil then
+    return false
+  end
+end
+
+function DropItem()
+  crawl.do_commands({"CMD_DROP"})
+  if you.floor_items() == nil then
+    return
+  end
+
+  for _, it in ipairs(you.floor_items()) do
+    if not it.artifact and it:class(true) == "Jewellery" and it.dropped then
+      c_persist.dropped_rings[it:ego()] = true
+    end
+  end
+end
+
+function DebugAutopickup()
+    if you.floor_items() == nil then
+    return
+  end
+
+  for _, it in ipairs(you.floor_items()) do
+    local cur = items.equipped_at(it.equip_type)
+    local class = it:class(true)
+    if class == "Armour" then
+      crawl.mpr("Item's weight class: ".. WeightClass(it))
+      crawl.mpr("Current weight class: ".. WeightClass(cur))
+      crawl.mpr("Current rarity class: ".. RarityClass(cur))
+      crawl.mpr("Item's rarity class: ".. RarityClass(it))
+    elseif class == "Jewellery" then
+      local isDropped = c_persist.dropped_rings[it:ego()] ~= nil
+      local isDroppedMsg = isDropped and "has" or "has not"
+      crawl.mpr(it:ego() .. " " .. isDroppedMsg .. " been dropped.")
+    end
+  end
+end
+
+
+function ready()
+  AnnounceDamage()
+  OpenSkills()
+
+  ShoutWalkManager()
+  AutoExcludeUpstairs()
+
+  --threat warning
+  if DEBUG_YOU_STATUS == true then crawl.mpr(you.status() .. " || " .. you.transform()) end
+  status:update()
+end
+}
+
+######################################################################
+#                          General Settings                          #
+######################################################################
+
+# Sets skill training to manual
+default_manual_training = true
+
+# Force uppercase Y on dangerous questions
+easy_confirm            = safe
+
+# 'W'ear will also allow you to 'T'ake off worn armour, and vice versa, and the same is true for 'P'utting on / 'R'emoving jewellery
+equip_unequip           = true
+
+# How long auto-explore waits after each move (milliseconds)
+explore_delay           = -1
+
+hp_colour               = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
+
+mp_colour               = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
+
+# Logs chat messages into the notes
+note_chat_messages      = true
+
+# How long resting waits after each move (milliseconds)
+rest_delay              = -1
+
+# If true, only stop resting when both HP/MP are full
+rest_wait_both          = true
+
+# Try it. Shows 'more' prompts when outputting more than one screen of messages
+show_more               = false
+
+# Highlights the path taking during autoexplore or travel
+show_travel_trail       = true
+
+# If true, disables smart targeting for explosion and bouncing bolt spells
+simple_targeting        = false
+
+# Items are sorted according to: equipped, basename, qualname, curse, qty
+sort_menus              = true
+
+stat_colour             = 3:red, 7:lightred
+
+# How long travel waits after each move (milliseconds)
+travel_delay            = -1
+
+# Prefixes manually added notes with the -- string, to make them easier to find
+user_note_prefix        = --
+
+# Controls the speed of animations
+view_delay              = 100
+
+# Adjusts how much autoexplore favours attempting to discover room perimeters and corners.
+# At values higher than 0, autoexplore will more heavily favour visiting squares that are next to walls
+# reasonable values range from 0 to 10 maybe?
+# Try it.
+#explore_wall_bias       = 3
+
+## Implojin
+prompt_menu = false
+# try to prevent autopick from being interrupted during zig cleanup?
+travel_key_stop = false
+#tile_key_repeat_delay = 150
+
+## Prakerore
+confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Greater Servant of Makhleb, Lesser Servant of Makhleb, Fiery Armour, Foxfire Swarm, Rising Flame, Draw Stack, Channel Magic, Divine Exegesis, Finesse, Death's Door, Evoke Invisibility, Unearth Wretches, Torment
+
+## me
+rest_wait_ancestor = true
+tile_show_threat_levels = tough, nasty, unusual
+bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
+fail_severity_to_confirm = 0
+more += Found a staircase to the Ecumenical Temple
+more += You add the spells
+more += forbidden knowledge
+more += Your unholy channel is weakening.
+
+# For gems
+#more_gem_info = true
+#always_show_gems = true
+#explore_auto_rest = false
+#rest_wait_percent = 60
+
+
+######################################################################
+#                           Character Dump                           #
+######################################################################
+
+dump_order     = header, hiscore, stats, misc, inventory, skills, spells
+dump_order    += overview, mutations, messages, screenshot, skill_gains
+dump_order    += notes, turns_by_place, kills_by_place
+dump_order    += action_counts, kills, monlist, vaults
+
+dump_book_spells = false
+ood_interesting = 6
+note_hp_percent = 25
+note_all_skill_levels = true
+note_xom_effects = true
+note_items += of Zot,rod,acquirement
+note_messages += Your scales start
+note_messages += protects you from harm
+note_messages += You fall through a shaft
+note_messages += [bB]anish.*Abyss
+
+# Use the notes in the character dump to spoil information about whether an
+# enemy has been seen before (i.e. have I now killed the same demonologist
+# from which I have fled earlier or was this a different one?).
+note_monsters += Brimstone Fiend
+note_monsters += Ice Fiend
+note_monsters += Tzitzimitl
+note_monsters += caustic shrike
+note_monsters += curse skull
+note_monsters += curse toe
+note_monsters += deep elf demonologist
+note_monsters += deep elf sorcerer
+note_monsters += entropy weaver
+note_monsters += lich
+note_monsters += ancient lich
+note_monsters += pearl dragon
+note_monsters += orb of fire
+
+
+######################################################################
+#                             Spell Slots                            #
+######################################################################
+
+# Set Alias for Spell Slots
+slot := spell_slot
+
+slot += Fireball:f
+slot += Apportation:g
+slot += Sublimation of Blood:m
+slot += Slow:s
+slot += Sticky Flame:s
+slot += Swiftness:s
+slot += Passwall:w
+slot += Corona:v
+slot += Iskenderun's Mystic Blast:x
+slot += Mephitic Cloud:x
+slot += Vampiric Draining:x
+slot += Iskenderun's Battlesphere:z
+slot += Lee's Rapid Deconstruction:z
+slot += Animate Dead:A
+slot += Animate Skeleton:A
+slot += Ozocubu's Armour:A
+slot += Death's Door:D
+slot += Borgnjor's Revivification:R
+slot += Fugue of the Fallen:S
+
+######################################################################
+#                            Auto Pickup                             #
+######################################################################
+
+# Gold, scrolls, potions, books, jewellery, wands, gems, staves, orbs, talismans, misc
+autopickup = $?!:"/♦|0%}
+
+
+############################################################################
+#                            Auto Inscriptions                             #
+############################################################################
+
+# Set Alias
+ai := autoinscribe
+
+# Inscribe distortion weapons if you are not worshipping Lugonu
+: if you.god() ~= "Lugonu" then
+    ai += distortion:!w
+  ai += (Sonja|Psyche):!w
+: end
+
+
+# Consumables
+ai += (bad|dangerous)_item.*potion:!q
+ai += potions? of berserk rage:!q
+ai += potions? of mutation:!q
+ai += (bad|dangerous)_item.*scroll:!r
+ai += scrolls? of blinking:!r
+ai += scrolls? of revelation:!r
+ai += scrolls? of vulnerability:!r
+
+# Body Armour
+ai += fire dragon (armour|hide):rF++, rC-
+ai += gold dragon (armour|hide):rC+, rF+, rPois
+ai += ice dragon (armour|hide):rC++, rF-
+ai += pearl dragon (armour|hide):rN+
+ai += quicksilver dragon armour:Will+
+ai += shadow dragon (armour|hide):Stlth++++
+ai += steam dragon (armour|hide):rSteam
+ai += storm dragon (armour|hide):rElec
+ai += swamp dragon (armour|hide):rPois
+ai += troll (hide|leather armour):Regen
+
+# Body Armour Egos
+ai += ([^l] leather armour|mail|plate armour|robe|skin) of cold resistance:rC+
+ai += ([^l] leather armour|mail|plate armour|robe|skin) of fire resistance:rF+
+ai += (leather armour|mail|plate armour|robe) of willpower:Will+
+ai += (leather armour|mail|plate armour|robe) of positive energy:rN+
+ai += (leather armour|mail|plate armour) of poison resistance:rPois
+ai += plate armour of ponderousness:Speed-
+ai += robe of resistance:rC+, rF+
+ai += troll leather armour of cold resistance:rC+
+ai += troll leather armour of fire resistance:rF+
+
+# Accessory Egos
+ai += (barding|boots) of flight:+Fly
+ai += (buckler|shield) of protection:AC+3
+ai += (buckler|shield) of resistance:rC+, rF+
+ai += hat of spirit shield:Spirit
+
+# Amulets
+ai += amulet of faith:Faith, !P
+
+# Rings
+ai += ring of fire:rF+, rC-
+ai += ring of ice:rC+, rF-
+ai += ring of magical power:MP+9
+ai += ring of poison resistance:rPois
+ai += ring of positive energy:rN+
+ai += ring of protection from cold:rC+
+ai += ring of protection from fire:rF+
+ai += ring of willpower:Will+
+#ai += ring of see invisible:sI
+ai += ring of stealth:Stlth+
+ai += ring of wizardry:Wiz+
+
+# Staves
+ai += staff of air:rElec
+ai += staff of cold:rC+
+ai += staff of death:rN+
+ai += staff of fire:rF+
+ai += staff of alchemy:rPois
+ai += staff of wizardry:Wiz+
+
+show_god_gift = unident
+
+############################################################################
+#                                  Macros                                  #
+############################################################################
+
+## Shout walk binding
+macros += M \{25} ===shout_walk_y 
+macros += M \{21} ===shout_walk_u 
+macros += M \{8} ===shout_walk_h 
+macros += M \{2} ===shout_walk_b 
+macros += M \{14} ===shout_walk_n 
+macros += M \{10} ===shout_walk_j 
+macros += M \{11} ===shout_walk_k 
+macros += M \{12} ===shout_walk_l 
+
+## spells
+macros += M 1 za
+macros += M 2 zb
+macros += M 3 zc
+macros += M 4 zd
+macros += M 6 ze
+macros += M 7 zf
+macros += M 8 zg
+macros += M 9 zh
+macros += M w ===FelidZF
+macros += M e ze
+
+## safe explore
+macros += M o ===SafeExplore
+macros += K1 o <
+macros += K1 O .
+
+## downstairs prompt
+macros += M > ===SafeDownstairs
+
+## autopickup
+macros += M d ===DropItem
+macros += M D ===DebugAutopickup
+:add_autopickup_func(autopickup)
