@@ -1484,7 +1484,7 @@ function autopickup(it, name)
 end
 
 -- Helper to show autopickup logic
--- TODO: Add debug option to ShouldPick functions and print using that
+-- TODO: Add debug option to ShouldPick functions and print using that?
 function DebugAutopickup()
   if you.floor_items() == nil then
     return
@@ -1505,7 +1505,7 @@ function DebugAutopickup()
     elseif class == "Jewellery" then
       local isDropped = c_persist.dropped_rings[it:ego()] ~= nil
       local isDroppedMsg = isDropped and "has" or "has not"
-      crawl.mpr(it:ego() .. " " .. isDroppedMsg .. " been dropped.")
+      crawl.mpr(it:ego() .. " ego " .. isDroppedMsg .. " been dropped.")
     elseif class == "Hand Weapons" then
       local cur = items.equipped_at("Weapon")
       local preferReason
