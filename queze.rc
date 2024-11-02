@@ -1365,28 +1365,31 @@ function IsDuplicateArmour(it, cur)
     return false
   end
 
+  -- Create table if it doesn't exist
+  if c_persist.armour_enchantments[GetBaseName(it)] == nil then
+    c_persist.armour_enchantments[GetBaseName(it)] = {}
+  end
+
   local sameType = c_persist.armour_enchantments[GetBaseName(it)]
-  if sameType ~= nil then
-    local ego = it.branded and it:ego() or "plain"
+  local ego = it.branded and it:ego() or "plain"
+  
+  if sameType[ego] ~= nil then
+    -- Compare with table, if enchantment is lower, skip
+    if it.plus < sameType[ego] then
+      return true
+    end
 
-    if sameType[ego] ~= nil then
-      -- If enchantment is lower, skip
-      if it.plus < sameType[ego] then
+    -- If same as current, skip
+    if cur ~= nil and not cur.artefact then
+      local curEgo = cur.branded and cur:ego() or "plain"
+      if ego == curEgo and it.plus <= cur.plus then
         return true
-      end
-
-      -- If same as current, skip
-      if cur ~= nil and not cur.artefact then
-        local curEgo = cur.branded and cur:ego() or "plain"
-        if ego == curEgo and it.plus <= cur.plus then
-          return true
-        end
       end
     end
   end
 
   -- Otherwise, update highest enchantment
-  c_persist.armour_enchantments[GetBaseName(it)] = it.plus
+  sameType[ego] = it.plus
   return false
 end
 
