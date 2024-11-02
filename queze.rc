@@ -1345,11 +1345,11 @@ function WeightClass(it)
   end
 end
 
--- None: 0, Plain: 1, Branded: 2, Artifact: 3
+-- None: 0, Plain: 1, Branded: 2, Artefact: 3
 function RarityClass(it)
   if it == nil then
     return 0
-  elseif it.artifact then
+  elseif it.artefact then
     return 3
   elseif it.branded then
     return 2
@@ -1360,7 +1360,7 @@ end
 
 -- Check if an armour with the same type, same ego and higher enchantment already exists
 function IsDuplicateArmour(it)
-  if it.artifact then
+  if it.artefact then
     return false
   end
 
@@ -1405,16 +1405,16 @@ function DropItem()
   end
 
   for _, it in ipairs(you.floor_items()) do
-    if not it.artifact and it:class(true) == "Jewellery" and it.dropped then
+    if not it.artefact and it:class(true) == "Jewellery" and it.dropped then
       c_persist.dropped_rings[it:ego()] = true
     end
   end
 end
 
 -- Ring pickup logic
--- Do not pick up duplicates of a dropped non-artifact ring
+-- Do not pick up duplicates of a dropped non-artefact ring
 function ShouldPickRing(it)
-  if not it.artifact and c_persist.dropped_rings[it:ego()] ~= nil then
+  if not it.artefact and c_persist.dropped_rings[it:ego()] ~= nil then
     return false
   end
 end
@@ -1432,8 +1432,8 @@ end
 
 -- Weapon pickup logic
 function ShouldPickWeapon(it)
-  -- 1. Always pick up artifacts
-  if it.artifact then
+  -- 1. Always pick up artefacts
+  if it.artefact then
     return true
   end
 
@@ -1483,6 +1483,8 @@ function autopickup(it, name)
   end
 end
 
+-- Helper to show autopickup logic
+-- TODO: Add debug option to ShouldPick functions and print using that
 function DebugAutopickup()
   if you.floor_items() == nil then
     return
