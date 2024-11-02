@@ -1325,8 +1325,11 @@ end
 
 
 -- Equipment autopickup
--- TODO: Extend logic to armour, if branded AND (has seen item of same type and same ego AND enchantment is lower) OR then don't pick up
--- TODO: Extend to weapons too, checking weapon category, if same category then same as previous checks, if diff category only if artifact
+-- TODO: Weapons. 
+-- Always pickup artifacts
+-- If no weapon and 0 UC skill, pick up any weapon.
+-- If not interested in weapons (0 in all weapon skills), prefer fast weapons (if not artifact)
+-- If interested in weapons, check currently wielded, if same type pick equal or greater rarity, if same subclass pick greater rarity
 
 -- Reset tables at the start of each game
 if you.turns() == 0 or c_persist.dropped_rings == nil then c_persist.dropped_rings = {} end
@@ -1385,14 +1388,13 @@ function IsDuplicateArmour(it)
 end
 
 -- Armour pickup logic
+-- Pick if (not duplicate) AND (same weight class) AND (equal or higher rarity)
 function ShouldPickArmour(it)
     if IsDuplicateArmour(it) then
       return false
     end
 
     local cur = items.equipped_at(it.equip_type)
-
-    -- Pickup armour of the same weight class, if it has equal or higher rarity
     local equal_weight = WeightClass(it) == WeightClass(cur)
     local greater_rarity = RarityClass(it) >= RarityClass(cur)
     if equal_weight and greater_rarity then
@@ -1400,12 +1402,74 @@ function ShouldPickArmour(it)
     end
 end
 
+-- Handles updating dropped rings
+function DropItem()
+  crawl.do_commands({"CMD_DROP"})
+  if you.floor_items() == nil then
+    return
+  end
+
+  for _, it in ipairs(you.floor_items()) do
+    if not it.artifact and it:class(true) == "Jewellery" and it.dropped then
+      c_persist.dropped_rings[it:ego()] = true
+    end
+  end
+end
+
 -- Ring pickup logic
+-- Do not pick up duplicates of a dropped non-artifact ring
 function ShouldPickRing(it)
-  -- Do not pick up duplicates of a dropped non-artifact ring
   if not it.artifact and c_persist.dropped_rings[it:ego()] ~= nil then
     return false
   end
+end
+
+-- Check all weapon skills to determine if "interested" (i.e. has trained any weapon skill)
+function InterestedInWeapons()
+  local weapon_skills = {"Maces & Flails", "Axes", "Polearms", "Staves", "Short Blades", "Long Blades", "Ranged Weapons"}
+  for _, skill in ipairs(weapon_skills) do
+    if you.skill(skill) > 0 then
+      return true
+    end
+  end
+  return false
+end
+
+-- Weapon pickup logic
+function ShouldPickWeapon(it)
+  -- 1. Always pick up artifacts
+  if it.artifact then
+    return true
+  end
+
+  -- 2. If no weapon equipped, pick up any weapon iff 0 UC skill
+  local cur = items.equipped_at("Weapon")
+  if cur == nil then
+    return you.skill("Unarmed Combat") == 0
+  end
+
+  local isPreferred
+  -- 3. If 0 weapon skills, prefer fast weapons if 0 Summonings skill, otherwise prefer reach weapons
+  if not InterestedInWeapons() then
+    if you.skill("Summonings") == 0 then
+      isPreferred = it.delay <= 10
+    else
+      isPreferred = it.reach_range > 1
+    end
+  else
+    -- 4. If interested in weapons, prefer weapons using the same skill
+    isPreferred = it.weap_skill == cur.weap_skill
+  end
+
+  -- 5. If preferred, pick up if equal or greater rarity
+  if isPreferred then
+    return RarityClass(it) >= RarityClass(cur)
+  else
+    -- 6. If not preferred, only pick up if greater rarity
+    return RarityClass(it) > RarityClass(cur)
+  end
+
+  return
 end
 
 -- "yes pickup": true, "no pickup": false, "no opinion": nil
@@ -1419,20 +1483,8 @@ function autopickup(it, name)
     return ShouldPickArmour(it)
   elseif class == "Jewellery" then
     return ShouldPickRing(it)
-  end
-end
-
-function DropItem()
-  crawl.do_commands({"CMD_DROP"})
-  if you.floor_items() == nil then
-    return
-  end
-
-  for _, it in ipairs(you.floor_items()) do
-    -- Update dropped rings
-    if not it.artifact and it:class(true) == "Jewellery" and it.dropped then
-      c_persist.dropped_rings[it:ego()] = true
-    end
+  elseif class == "Weapon" then
+    return ShouldPickWeapon(it)
   end
 end
 
