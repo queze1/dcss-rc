@@ -1076,6 +1076,48 @@ function FindMessage(match, stop)
   end
 end
 
+-- Helper function which gets the base name of an item
+function GetBaseName(it)
+  -- item.name still retains inscriptions, so remove using pattern
+  -- Match everything that precedes the first '{' (if any), trimming any extra whitespace
+  local base_name = it.name("qual"):match("^[^{]+"):gsub("%s*$", "")
+  return base_name
+end
+
+-- Helper function which prints a table recursively
+function PrintTable(tbl, indent)
+  -- Set the initial indentation (used for recursive calls)
+  indent = indent or 0
+  local indent_str = string.rep("  ", indent)
+
+  -- Iterate over indexed elements using `ipairs`
+  for i, v in ipairs(tbl) do
+    if type(v) == "table" then
+      crawl.mpr(indent_str .. "[" .. i .. "] => Table {")
+      -- Recursively print the nested table
+      PrintTable(v, indent + 1)
+      crawl.mpr(indent_str .. "}")
+    else
+      crawl.mpr(indent_str .. "[" .. i .. "] => " .. tostring(v))
+    end
+  end
+
+  -- Iterate over non-indexed elements using `pairs`
+  for k, v in pairs(tbl) do
+    -- Check if this table entry was already covered by `ipairs`
+    if type(k) ~= "number" or k > #tbl then
+      if type(v) == "table" then
+        crawl.mpr(indent_str .. tostring(k) .. " => Table {")
+        -- Recursively print the nested table
+        PrintTable(v, indent + 1)
+        crawl.mpr(indent_str .. "}")
+      else
+        crawl.mpr(indent_str .. tostring(k) .. " => " .. tostring(v))
+      end
+    end
+  end
+end
+
 -- end helper lua
 
 
@@ -1200,12 +1242,15 @@ function SafeExplore()
   else
     retreated = true
   
+    -- Point to stairs if within LOS
     for _, c in ipairs(LOSCoords()) do
       if IsUpstair(view.feature_at(c.x, c.y)) then
-	    crawl.sendkeys("X<")
-		return
+	      crawl.sendkeys("X<")
+		    return
+	    end
 	  end
-	end  
+
+    -- Otherwise, just open level map
     crawl.sendkeys("X")
   end
 end
@@ -1280,14 +1325,12 @@ end
 
 
 -- Equipment autopickup
--- Do not pick up duplicates of a dropped non-artifact ring
--- TODO: Extend drop check to armour, if branded AND (same type as item in inventory AND enchantment is lower) OR (ego has been dropped) then don't pick up
+-- TODO: Extend logic to armour, if branded AND (has seen item of same type and same ego AND enchantment is lower) OR then don't pick up
 -- TODO: Extend to weapons too, checking weapon category, if same category then same as previous checks, if diff category only if artifact
 
--- Resets dropped rings at the start of each game
-if you.turns() == 0 or c_persist.dropped_rings == nil then
-  c_persist.dropped_rings = {}
-end
+-- Reset tables at the start of each game
+if you.turns() == 0 or c_persist.dropped_rings == nil then c_persist.dropped_rings = {} end
+if you.turns() == 0 or c_persist.armour_enchantments == nil then c_persist.armour_enchantments = {} end
 
 -- Weightless (0): 0, Light (1-5): 1, Medium (6-11): 2, Heavy (12-99): 3
 function WeightClass(it)
@@ -1317,6 +1360,55 @@ function RarityClass(it)
   end
 end
 
+-- Check if an armour with the same type, same ego and higher enchantment already exists
+function IsDuplicateArmour(it)
+  if it.artifact then
+    return false
+  end
+
+  local sameType = c_persist.armour_enchantments[GetBaseName(it)]
+  if sameType ~= nil then
+    local ego = it.branded and it:ego() or "plain"
+
+    if sameType[ego] ~= nil then
+      -- If enchantment is lower, skip
+      if it.plus < sameType[ego] then
+        return true
+      else
+        -- Otherwise, update highest enchantment
+        sameType[ego] = it.plus
+      end
+    end
+  end
+
+  return false
+end
+
+-- Armour pickup logic
+function ShouldPickArmour(it)
+    if IsDuplicateArmour(it) then
+      return false
+    end
+
+    local cur = items.equipped_at(it.equip_type)
+    
+    -- Pickup armour of the same weight class, if it has equal or higher rarity
+    local equal_weight = WeightClass(it) == WeightClass(cur)
+    local greater_rarity = RarityClass(it) >= RarityClass(cur)
+    if equal_weight and greater_rarity then
+      return true
+    end
+end
+
+-- Ring pickup logic
+function ShouldPickRing(it)
+  -- Do not pick up duplicates of a dropped non-artifact ring
+  if not it.artifact and c_persist.dropped_rings[it:ego()] ~= nil then
+    return false
+  end
+end
+
+-- "yes pickup": true, "no pickup": false, "no opinion": nil
 function autopickup(it, name)
   if it.is_useless then
     return
@@ -1324,16 +1416,9 @@ function autopickup(it, name)
   
   local class = it:class(true)
   if class == "Armour" then
-    local cur = items.equipped_at(it.equip_type)
-
-    -- Pickup armour of the same weight class, if it has equal or higher rarity
-    local equal_weight = WeightClass(it) == WeightClass(cur)
-    local greater_rarity = RarityClass(it) >= RarityClass(cur)
-    if equal_weight and greater_rarity then
-      return true
-    end
-  elseif class == "Jewellery" and c_persist.dropped_rings[it:ego()] ~= nil then
-    return false
+    return ShouldPickArmour(it)
+  elseif class == "Jewellery" then
+    return ShouldPickRing(it)
   end
 end
 
@@ -1344,6 +1429,7 @@ function DropItem()
   end
 
   for _, it in ipairs(you.floor_items()) do
+    -- Update dropped rings
     if not it.artifact and it:class(true) == "Jewellery" and it.dropped then
       c_persist.dropped_rings[it:ego()] = true
     end
@@ -1359,10 +1445,7 @@ function DebugAutopickup()
     local cur = items.equipped_at(it.equip_type)
     local class = it:class(true)
     if class == "Armour" then
-      crawl.mpr("Item's weight class: ".. WeightClass(it))
-      crawl.mpr("Current weight class: ".. WeightClass(cur))
-      crawl.mpr("Current rarity class: ".. RarityClass(cur))
-      crawl.mpr("Item's rarity class: ".. RarityClass(it))
+      crawl.mpr("Item's base name: ".. GetBaseName(it))
     elseif class == "Jewellery" then
       local isDropped = c_persist.dropped_rings[it:ego()] ~= nil
       local isDroppedMsg = isDropped and "has" or "has not"
