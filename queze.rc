@@ -1391,7 +1391,7 @@ function ShouldPickArmour(it)
     end
 
     local cur = items.equipped_at(it.equip_type)
-    
+
     -- Pickup armour of the same weight class, if it has equal or higher rarity
     local equal_weight = WeightClass(it) == WeightClass(cur)
     local greater_rarity = RarityClass(it) >= RarityClass(cur)
@@ -1437,7 +1437,7 @@ function DropItem()
 end
 
 function DebugAutopickup()
-    if you.floor_items() == nil then
+  if you.floor_items() == nil then
     return
   end
 
@@ -1445,7 +1445,14 @@ function DebugAutopickup()
     local cur = items.equipped_at(it.equip_type)
     local class = it:class(true)
     if class == "Armour" then
-      crawl.mpr("Item's base name: ".. GetBaseName(it))
+      PrintTable(c_persist.armour_enchantments)
+
+      local isDuplicatemsg = IsDuplicateArmour(it) and "is" or "is not"
+      local pickupMsg = ShouldPickArmour(it) and "would" or "would not"
+
+      crawl.mpr("Base name: " .. GetBaseName(it))
+      crawl.mpr(it.name() .. " " .. isDuplicatemsg .. " a duplicate.")
+      crawl.mpr(it.name() .. " " .. pickupMsg .. " be picked up by autopickup.")
     elseif class == "Jewellery" then
       local isDropped = c_persist.dropped_rings[it:ego()] ~= nil
       local isDroppedMsg = isDropped and "has" or "has not"
