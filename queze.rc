@@ -1325,11 +1325,6 @@ end
 
 
 -- Equipment autopickup
--- TODO: Weapons. 
--- Always pickup artifacts
--- If no weapon and 0 UC skill, pick up any weapon.
--- If not interested in weapons (0 in all weapon skills), prefer fast weapons (if not artifact)
--- If interested in weapons, check currently wielded, if same type pick equal or greater rarity, if same subclass pick greater rarity
 
 -- Reset tables at the start of each game
 if you.turns() == 0 or c_persist.dropped_rings == nil then c_persist.dropped_rings = {} end
@@ -1442,10 +1437,10 @@ function ShouldPickWeapon(it)
     return true
   end
 
-  -- 2. If no weapon equipped, pick up any weapon iff 0 UC skill
+  -- 2. If no weapon equipped, pick up any weapon if 0 UC skill and D:1 (casters at game start)
   local cur = items.equipped_at("Weapon")
   if cur == nil then
-    return you.skill("Unarmed Combat") == 0
+    return you.skill("Unarmed Combat") == 0 and you.where() == "D:1"
   end
 
   local isPreferred
@@ -1483,7 +1478,7 @@ function autopickup(it, name)
     return ShouldPickArmour(it)
   elseif class == "Jewellery" then
     return ShouldPickRing(it)
-  elseif class == "Weapon" then
+  elseif class == "Hand Weapons" then
     return ShouldPickWeapon(it)
   end
 end
@@ -1494,8 +1489,8 @@ function DebugAutopickup()
   end
 
   for _, it in ipairs(you.floor_items()) do
-    local cur = items.equipped_at(it.equip_type)
     local class = it:class(true)
+
     if class == "Armour" then
       PrintTable(c_persist.armour_enchantments)
 
@@ -1504,11 +1499,34 @@ function DebugAutopickup()
 
       crawl.mpr("Base name: " .. GetBaseName(it))
       crawl.mpr(it.name() .. " " .. isDuplicatemsg .. " a duplicate.")
-      crawl.mpr(it.name() .. " " .. pickupMsg .. " be picked up by autopickup.")
+      crawl.mpr("This armour " .. pickupMsg .. " be picked up by autopickup.")
     elseif class == "Jewellery" then
       local isDropped = c_persist.dropped_rings[it:ego()] ~= nil
       local isDroppedMsg = isDropped and "has" or "has not"
       crawl.mpr(it:ego() .. " " .. isDroppedMsg .. " been dropped.")
+    elseif class == "Hand Weapons" then
+      local cur = items.equipped_at("Weapon")
+      local preferReason
+      local isPreferred
+      if not InterestedInWeapons() then
+        if you.skill("Summonings") == 0 then
+          preferReason = "fast"
+          isPreferred = it.delay <= 10
+        else
+          preferReason = "reach"
+          isPreferred = it.reach_range > 1
+        end
+      else
+        preferReason = "same skill"
+        isPreferred = it.weap_skill == cur.weap_skill
+      end
+
+      local pickupMsg = ShouldPickWeapon(it) and "would" or "would not"
+      local isPreferredMsg = isPreferred and "is" or "is not"
+
+      crawl.mpr("You prefer " .. preferReason .. " weapons.")
+      crawl.mpr(it.name() .. " " .. isPreferredMsg .. " preferred.")
+      crawl.mpr("This weapon " .. pickupMsg .. " be picked up by autopickup.")
     end
   end
 end
