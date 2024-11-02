@@ -995,8 +995,8 @@ function LOSCoords()
   local coords = {}
   for x = -you.los(), you.los() do
     for y = -you.los(), you.los() do
-	  table.insert(coords, {x = x, y = y})
-	end
+	    table.insert(coords, {x = x, y = y})
+	  end
   end
   return coords
 end
@@ -1069,8 +1069,7 @@ function FindMessage(match, stop)
 
     if string.find(message, match) then
       return message
-    end
-    if string.find(message, stop) then
+    elseif string.find(message, stop) then
       return
     end
   end
@@ -1359,8 +1358,8 @@ function RarityClass(it)
 end
 
 -- Check if an armour with the same type, same ego and higher enchantment already exists
--- Note: Can't check if floor item has a strictly greater enchantment, otherwise the table will be immediately updated and it will never be picked up, no hook which triggers when an item is picked up, so only check greater or equal and add check to compare with current  
-function IsDuplicateArmour(it, cur)
+-- Note: Can't check if floor item has a strictly greater enchantment, otherwise the table will be immediately updated and it will never be picked up, no hook which triggers when an item is picked up, so compare with table and inventory
+function IsDuplicateArmour(it)
   if it.artefact then
     return false
   end
@@ -1373,22 +1372,26 @@ function IsDuplicateArmour(it, cur)
   local sameType = c_persist.armour_enchantments[GetBaseName(it)]
   local ego = it.branded and it:ego() or "plain"
   
-  if sameType[ego] ~= nil then
-    -- Compare with table, if enchantment is lower, skip
-    if it.plus < sameType[ego] then
-      return true
-    end
+  -- Compare with table, if enchantment is lower, skip
+  if sameType[ego] ~= nil and it.plus < sameType[ego] then
+    return true
+  end
 
-    -- If same as current, skip
-    if cur ~= nil and not cur.artefact then
+  -- Compare with inventory, if enchantment is lower or equal, skip
+  for _, cur in ipairs(items.inventory()) do
+    local isComparable = GetBaseName(cur) == GetBaseName(it)
+
+    if isComparable and not cur.artefact then
       local curEgo = cur.branded and cur:ego() or "plain"
       if ego == curEgo and it.plus <= cur.plus then
+        -- Update highest enchantment with inventory item
+        sameType[ego] = cur.plus
         return true
       end
     end
   end
 
-  -- Otherwise, update highest enchantment
+  -- Otherwise, update highest enchantment with floor item
   sameType[ego] = it.plus
   return false
 end
@@ -1396,11 +1399,11 @@ end
 -- Armour pickup logic
 -- Pick if (not duplicate) AND (same weight class) AND (equal or higher rarity)
 function ShouldPickArmour(it)
-    local cur = items.equipped_at(it.equip_type)
-    if IsDuplicateArmour(it, cur) then
+    if IsDuplicateArmour(it) then
       return false
     end
 
+    local cur = items.equipped_at(it.equip_type)
     local equal_weight = WeightClass(it) == WeightClass(cur)
     local greater_rarity = RarityClass(it) >= RarityClass(cur)
     if equal_weight and greater_rarity then
