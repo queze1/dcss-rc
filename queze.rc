@@ -1324,10 +1324,12 @@ end
 
 
 -- Equipment autopickup
+-- TODO: Magical staves, pick up if new and gives a useful resist OR has a spell which would be enhanced by it
+-- TODO: If you have created an item stash (0 waypoint in Lair:1), and have 0/1 slots remaining, temporarily turn off autopickup for scrolls/potions in the stash? (with an info message ofc)
 
 -- Reset tables at the start of each game
 if you.turns() == 0 or c_persist.dropped_rings == nil then c_persist.dropped_rings = {} end
-if you.turns() == 0 or c_persist.armour_enchantments == nil then c_persist.armour_enchantments = {} end
+if you.turns() == 0 or c_persist.item_enchantments == nil then c_persist.item_enchantments = {} end
 
 -- Weightless (0): 0, Light (1-5): 1, Medium (6-11): 2, Heavy (12-99): 3
 function WeightClass(it)
@@ -1352,54 +1354,61 @@ function RarityClass(it)
     return 3
   elseif it.branded then
     return 2
+  elseif it:class(true) == "Magical Staves" then
+    -- Magical staves are unbranded, but still special
+    return 2
   else
     return 1
   end
 end
 
--- Check if an armour with the same type, same ego and higher enchantment already exists
+-- Check if an item with the same type, same ego and higher enchantment already exists
 -- Note: Can't check if floor item has a strictly greater enchantment, otherwise the table will be immediately updated and it will never be picked up, no hook which triggers when an item is picked up, so compare with table and inventory
-function IsDuplicateArmour(it)
+function IsDuplicateItem(it)
   if it.artefact then
     return false
   end
 
   -- Create table if it doesn't exist
-  if c_persist.armour_enchantments[GetBaseName(it)] == nil then
-    c_persist.armour_enchantments[GetBaseName(it)] = {}
+  if c_persist.item_enchantments[GetBaseName(it)] == nil then
+    c_persist.item_enchantments[GetBaseName(it)] = {}
   end
 
-  local sameType = c_persist.armour_enchantments[GetBaseName(it)]
+  local sameType = c_persist.item_enchantments[GetBaseName(it)]
   local ego = it.branded and it:ego() or "plain"
+  local plus = it.plus or 0
   
   -- Compare with table, if enchantment is lower, skip
-  if sameType[ego] ~= nil and it.plus < sameType[ego] then
-    return true
+  if sameType[ego] ~= nil then
+    if plus < sameType[ego] then
+      return true
+    end
   end
 
   -- Compare with inventory, if enchantment is lower or equal, skip
   for _, cur in ipairs(items.inventory()) do
-    local isComparable = GetBaseName(cur) == GetBaseName(it)
+    local isComparable = GetBaseName(it) == GetBaseName(cur) and not cur.artefact
 
-    if isComparable and not cur.artefact then
+    if isComparable then
       local curEgo = cur.branded and cur:ego() or "plain"
-      if ego == curEgo and it.plus <= cur.plus then
+	    local curPlus = cur.plus or 0
+      if ego == curEgo and plus <= curPlus then
         -- Update highest enchantment with inventory item
-        sameType[ego] = cur.plus
+        sameType[ego] = curPlus
         return true
       end
     end
   end
 
   -- Otherwise, update highest enchantment with floor item
-  sameType[ego] = it.plus
+  sameType[ego] = plus
   return false
 end
 
 -- Armour pickup logic
 -- Pick if (not duplicate) AND (same weight class) AND (equal or higher rarity)
 function ShouldPickArmour(it)
-    if IsDuplicateArmour(it) then
+    if IsDuplicateItem(it) then
       return false
     end
 
@@ -1451,14 +1460,19 @@ function ShouldPickWeapon(it)
     return true
   end
 
-  -- 2. If no weapon equipped, pick up any weapon if 0 UC skill and D:1 (casters at game start)
+  -- 2. Skip duplicates
+  if IsDuplicateItem(it) then
+    return false
+  end
+
+  -- 3. If no weapon equipped, pick up any weapon if 0 UC skill and D:1 (casters at game start)
   local cur = items.equipped_at("Weapon")
   if cur == nil then
     return you.skill("Unarmed Combat") == 0 and you.where() == "D:1"
   end
 
   local isPreferred
-  -- 3. If 0 weapon skills, prefer fast weapons if 0 Summonings skill, otherwise prefer reach weapons
+  -- 4. If 0 weapon skills, prefer fast weapons if 0 Summonings skill, otherwise prefer reach weapons
   if not InterestedInWeapons() then
     if you.skill("Summonings") == 0 then
       isPreferred = it.delay <= 10
@@ -1466,18 +1480,18 @@ function ShouldPickWeapon(it)
       isPreferred = it.reach_range > 1
     end
   else
-    -- 4. If interested in weapons, prefer weapons using the same skill
+    -- 5. If interested in weapons, prefer weapons using the same skill
     isPreferred = it.weap_skill == cur.weap_skill
   end
 
-  -- 5. If preferred, pick up if equal or greater rarity
+  -- 6. If preferred, pick up if equal or greater rarity
   if isPreferred then
     return RarityClass(it) >= RarityClass(cur)
   else
-    -- 6. If not preferred, only pick up if greater rarity
+    -- 7. If not preferred, only pick up if greater rarity
     return RarityClass(it) > RarityClass(cur)
   end
-
+ 
   return
 end
 
@@ -1504,13 +1518,14 @@ function DebugAutopickup()
     return
   end
 
+  crawl.mpr("Item enchantments table: ")
+  PrintTable(c_persist.item_enchantments)
+
   for _, it in ipairs(you.floor_items()) do
     local class = it:class(true)
 
     if class == "Armour" then
-      PrintTable(c_persist.armour_enchantments)
-
-      local isDuplicatemsg = IsDuplicateArmour(it) and "is" or "is not"
+      local isDuplicatemsg = IsDuplicateItem(it) and "is" or "is not"
       local pickupMsg = ShouldPickArmour(it) and "would" or "would not"
 
       crawl.mpr("Base name: " .. GetBaseName(it))
@@ -1537,11 +1552,13 @@ function DebugAutopickup()
         isPreferred = it.weap_skill == cur.weap_skill
       end
 
+      local isDuplicatemsg = IsDuplicateItem(it) and "is" or "is not"
       local pickupMsg = ShouldPickWeapon(it) and "would" or "would not"
       local isPreferredMsg = isPreferred and "is" or "is not"
 
       crawl.mpr("You prefer " .. preferReason .. " weapons.")
       crawl.mpr(it.name() .. " " .. isPreferredMsg .. " preferred.")
+      crawl.mpr(it.name() .. " " .. isDuplicatemsg .. " a duplicate.")
       crawl.mpr("This weapon " .. pickupMsg .. " be picked up by autopickup.")
     end
   end
@@ -1738,8 +1755,14 @@ slot += Fugue of the Fallen:S
 #                            Auto Pickup                             #
 ######################################################################
 
-# Gold, scrolls, potions, books, jewellery, wands, gems, staves, orbs, talismans, misc
-autopickup = $?!:"/♦|0%}
+# Gold, scrolls, potions, books, jewellery, wands, gems, staves, orbs, misc
+autopickup = $?!:"/♦|0}
+
+# TODO: Figure out how to add death talisman
+# TODO: Check if orbs is already included as armour
+ae := autopickup_exceptions
+ae += <curare-tipped dart
+ae += <(granite|storm|death) talisman
 
 
 ############################################################################
@@ -1763,7 +1786,7 @@ ai += potions? of mutation:!q
 ai += (bad|dangerous)_item.*scroll:!r
 ai += scrolls? of blinking:!r
 ai += scrolls? of revelation:!r
-ai += scrolls? of vulnerability:!r
+#ai += scrolls? of vulnerability:!r
 
 # Body Armour
 ai += fire dragon (armour|hide):rF++, rC-
