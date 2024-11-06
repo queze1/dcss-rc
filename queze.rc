@@ -898,12 +898,12 @@ local status = {
         if self._last_updated == nil or self._last_updated ~= you.turns() then
             self:_update_mons()
             self:_update_threats()
-            --self:_reissue_warnings()
-            --self:_update_player_warnings()
-            --self:_issue_player_warnings()
-            --self._last_updated = you.turns()
+            self:_reissue_warnings()
+            self:_update_player_warnings()
+            self:_issue_player_warnings()
+            self._last_updated = you.turns()
         end
-        --self:_maybe_act()
+        self:_maybe_act()
     end, }
 
 local message_log_threat_table = {
@@ -1528,7 +1528,6 @@ function DebugAutopickup()
       local isDuplicatemsg = IsDuplicateItem(it) and "is" or "is not"
       local pickupMsg = ShouldPickArmour(it) and "would" or "would not"
 
-      crawl.mpr("Base name: " .. GetBaseName(it))
       crawl.mpr(it.name() .. " " .. isDuplicatemsg .. " a duplicate.")
       crawl.mpr("This armour " .. pickupMsg .. " be picked up by autopickup.")
     elseif class == "Jewellery" then
@@ -1552,9 +1551,9 @@ function DebugAutopickup()
         isPreferred = it.weap_skill == cur.weap_skill
       end
 
-      local isDuplicatemsg = IsDuplicateItem(it) and "is" or "is not"
       local pickupMsg = ShouldPickWeapon(it) and "would" or "would not"
       local isPreferredMsg = isPreferred and "is" or "is not"
+      local isDuplicatemsg = IsDuplicateItem(it) and "is" or "is not"
 
       crawl.mpr("You prefer " .. preferReason .. " weapons.")
       crawl.mpr(it.name() .. " " .. isPreferredMsg .. " preferred.")
@@ -1758,11 +1757,9 @@ slot += Fugue of the Fallen:S
 # Gold, scrolls, potions, books, jewellery, wands, gems, staves, orbs, misc
 autopickup = $?!:"/♦|0}
 
-# TODO: Figure out how to add death talisman
-# TODO: Check if orbs is already included as armour
 ae := autopickup_exceptions
 ae += <curare-tipped dart
-ae += <(granite|storm|death) talisman
+ae += <(granite|storm) talisman, <talisman of death
 
 
 ############################################################################
@@ -1786,7 +1783,6 @@ ai += potions? of mutation:!q
 ai += (bad|dangerous)_item.*scroll:!r
 ai += scrolls? of blinking:!r
 ai += scrolls? of revelation:!r
-#ai += scrolls? of vulnerability:!r
 
 # Body Armour
 ai += fire dragon (armour|hide):rF++, rC-
