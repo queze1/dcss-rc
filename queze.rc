@@ -57,6 +57,78 @@ note_messages += cast .* Abyss
 ######################################################################
 
 {
+-- Helper function which finds a message in the buffer which contains a pattern
+-- If a message matches the stop pattern, then return nil
+function FindMessage(match, stop)
+  local counter = 1
+  -- Check at most 100 messages
+  while (counter < 100)
+  do
+    message = crawl.messages(counter)
+    counter = counter + 1
+
+    if string.find(message, match) then
+      return message
+    end
+    if string.find(message, stop) then
+      return
+    end
+  end
+end
+
+-- Helper function returning true if you are completely rested
+function IsHealthy()
+  hp, mhp = you.hp()
+  mp, mmp = you.mp()
+  if hp < mhp then
+    return false
+  elseif mp < mmp then
+    return false
+  elseif you.contaminated() ~= 0 then
+    return false
+  end
+  return true
+end
+
+-- Helper function returning true if it's safe to rest
+function IsSafe()
+  local feature = view.feature_at(0, 0)
+  hp, mhp = you.hp()
+  mp, mmp = you.mp()
+  if IsUpstair(feature) then
+    return true
+  end
+  return IsHealthy()
+end
+
+-- Safe exploring
+local retreated = false
+function SafeExplore()
+  -- Do not allow exploring if you have a sentinel's mark
+  -- Not sure if you.status() works now
+  if FindMessage("mark forms upon you", "mark upon you fades away") then
+    crawl.mpr("<lightred>A sentinel's mark is upon you!<lightred>")
+	
+  elseif IsSafe() or retreated then
+    crawl.do_commands({"CMD_EXPLORE"})
+    retreated = false
+  
+  else
+    retreated = true
+  
+    -- If possible, retreat to a stair
+    for _, c in ipairs(LOSCoords()) do
+      if IsUpstair(view.feature_at(c.x, c.y)) then
+	    crawl.sendkeys("X<")
+		return
+	  end
+	end  
+
+    -- Otherwise, open level map
+    crawl.sendkeys("X")
+  end
+end
+
 -- Repurpose (w)ield for spellcasting, but only for felids
 function FelidZF()
   if you.race() == "Felid" then
