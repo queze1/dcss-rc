@@ -224,5 +224,4 @@ macros += M e ze
 
 ## Safe exploring
 macros += M o ===SafeExplore
-macros += K1 o <
 
