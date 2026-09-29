@@ -90,6 +90,20 @@ function IsHealthy()
   return true
 end
 
+-- Helper function returning true if a feature is an upstairs
+function IsUpstair(feature)
+  if feature == nil then
+    return false
+  elseif string.find(feature, "stairs_up") then
+    return true
+  elseif string.find(feature, "escape_hatch_up") then
+    return true
+  elseif string.find(feature, "exit_") then
+    return true
+  end
+  return false
+end
+
 -- Helper function returning true if it's safe to rest
 function IsSafe()
   local feature = view.feature_at(0, 0)
