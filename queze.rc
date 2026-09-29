@@ -96,8 +96,6 @@ function IsHealthy()
     return false
   elseif mp < mmp then
     return false
-  elseif you.contaminated() ~= 0 then
-    return false
   end
   return true
 end
