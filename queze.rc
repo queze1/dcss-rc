@@ -1,36 +1,39 @@
+######################################################################
+#                          General Settings                          #
+######################################################################
+default_manual_training = true
+
+autofight_stop = 70
+show_more = false
+
 travel_delay = -1
 explore_delay = -1
 rest_delay = -1
 explore_stop += greedy_items
 travel_open_doors = true
-ae = curare-tipped dart
-autofight_stop = 60
-show_more = false
-default_manual_training = true
+
+drop_disables_autopickup = true
+
 force_more_message += into view
-#force_more_message += slow
-explore_greedy = true
-explore_greedy_visit += glowing_items, artefacts
-always_show_gems = true
-more_gem_info = true
-#
+
 confirm_action += Death's Door
 confirm_action += Revivification
 confirm_action += Silence
 confirm_action += Torment
 confirm_action += Blink
 confirm_action += Rending Blade
-#
+
 unusual_monster_items += vulnerable:venom:7
-drop_disables_autopickup = true
 force_spell_targeter = Animate Dead
 force_spell_targeter = Permafrost Eruption
 force_spell_targeter = Malign Gateway
 
-#Morgue Stuff
-note_hp_percent = 10
+######################################################################
+#                           Character Dump                           #
+######################################################################
+note_chat_messages = true
+note_hp_percent = 25
 note_all_skill_levels = true
-note_chat_messages = false
 user_note_prefix = >>
 note_items += experience,of resistance, Archmagi
 note_items += crystal plate armour,pearl dragon scales
@@ -38,3 +41,4 @@ note_items += artefact
 note_messages += You feel monstrous
 note_messages += You pass through the gate
 note_messages += cast .* Abyss
+
