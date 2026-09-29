@@ -57,6 +57,18 @@ note_messages += cast .* Abyss
 ######################################################################
 
 {
+-- Helper function generating all coords in LOS
+function LOSCoords()
+  local x, y
+  local coords = {}
+  for x = -you.los(), you.los() do
+    for y = -you.los(), you.los() do
+	  table.insert(coords, {x = x, y = y})
+	end
+  end
+  return coords
+end
+
 -- Helper function which finds a message in the buffer which contains a pattern
 -- If a message matches the stop pattern, then return nil
 function FindMessage(match, stop)
