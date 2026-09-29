@@ -169,3 +169,8 @@ macros += M 9 zh
 macros += M w ===FelidZF
 macros += M e ze
 
+## Safe exploring
+macros += M o ===SafeExplore
+macros += K1 o <
+macros += K1 O .
+
