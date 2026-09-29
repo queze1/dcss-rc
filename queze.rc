@@ -240,6 +240,20 @@ function ShoutWalkManager()
   crawl.sendkeys(direction)
 end
 
+function ShoutWalkMapper()
+  shout_walk_y = ShoutWalkCreator("y")
+  shout_walk_u = ShoutWalkCreator("u")
+  shout_walk_h = ShoutWalkCreator("h")
+  shout_walk_b = ShoutWalkCreator("b")
+  shout_walk_n = ShoutWalkCreator("n")
+  shout_walk_j = ShoutWalkCreator("j")
+  shout_walk_k = ShoutWalkCreator("k")
+  shout_walk_l = ShoutWalkCreator("l")
+end
+
+-- Set up shout walk functions
+ShoutWalkMapper()
+
 -- =========================
 -- CUSTOM HOOKS
 -- =========================
