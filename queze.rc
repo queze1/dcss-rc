@@ -69,6 +69,18 @@ function LOSCoords()
   return coords
 end
 
+-- Helper function returning true if a hostile creature is in LOS
+function IsEnemyInLOS()
+  for _, c in ipairs(LOSCoords()) do
+    m = monster.get_monster_at(c.x, c.y)
+    -- 0 = hostile, 1 = neutral, 2 = strict neutral, 3 = good neutral, 4 = friendly
+    if m and m:attitude() < 1 and not m:is_safe() then
+      return true
+    end
+  end
+  return false
+end
+
 -- Helper function which finds a message in the buffer which contains a pattern
 -- If a message matches the stop pattern, then return nil
 function FindMessage(match, stop)
@@ -171,8 +183,22 @@ function OpenSkills()
   end
 end
 
+-- Excludes all upstairs in LOS if an enemy is in LOS
+function AutoExcludeUpstairs()
+  for _, c in ipairs(LOSCoords()) do
+    if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
+      if IsEnemyInLOS() then
+        travel.set_exclude(c.x, c.y, 2)
+      else
+        travel.del_exclude(c.x, c.y)
+      end
+    end
+  end
+end
+
 function ready()
   OpenSkills()
+  AutoExcludeUpstairs()
 end
 }
 
