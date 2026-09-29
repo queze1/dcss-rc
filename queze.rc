@@ -185,7 +185,7 @@ function FelidZF()
   end
 end
 
--- Hold alt when walking to shout before walking and stop if any monsters shout back
+-- Shout before walking and stop if any monsters shout back
 local noise_warning = false
 local next_direction
 
