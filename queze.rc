@@ -42,3 +42,49 @@ note_messages += You feel monstrous
 note_messages += You pass through the gate
 note_messages += cast .* Abyss
 
+
+######################################################################
+#                        Custom Lua Functions                        #
+######################################################################
+
+{
+-- Repurpose (w)ield for spellcasting, but only for felids
+function FelidZF()
+  if you.race() == "Felid" then
+    crawl.sendkeys("zf")
+  else
+    crawl.do_commands({"CMD_WIELD_WEAPON"})
+  end
+end
+
+-- Opens skill menu at the beginning of the game
+local need_skills_opened = true
+function OpenSkills()
+  if you.turns() == 0 and need_skills_opened then
+    need_skills_opened = false
+    crawl.sendkeys("m")
+  end
+end
+
+function ready()
+  OpenSkills()
+end
+}
+
+
+######################################################################
+#                               Macros                               #
+######################################################################
+
+## Spells
+macros += M 1 za
+macros += M 2 zb
+macros += M 3 zc
+macros += M 4 zd
+macros += M 6 ze
+macros += M 7 zf
+macros += M 8 zg
+macros += M 9 zh
+macros += M w ===FelidZF
+macros += M e ze
+
