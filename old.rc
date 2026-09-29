@@ -979,7 +979,7 @@ end
 -- "travel_open_doors = avoid" ordinarily causes problems with closed doors and interlevel travel.
 -- This permits autotravel to open doors that are in the way, when issuing G> and X> commands.
 function ch_start_running(runmode)
-    -- For SafeExplore
+    -- For SafeExplore, set flag on Shift+Dir run/level map travel/rest/...
     retreated = true
 
     if runmode == "intertravel" then
@@ -1079,13 +1079,8 @@ end
 
 -- Helper function returning true if it's safe to rest
 function IsSafe()
-  local feature = view.feature_at(0, 0)
-  hp, mhp = you.hp()
-  mp, mmp = you.mp()
-  if IsUpstair(feature) then
-    return true
-  end
-  return IsHealthy()
+  local onUpstair = IsUpstair(view.feature_at(0, 0))
+  return onUpstair or IsHealthy()
 end
 
 -- Helper function which finds a message in the buffer which contains a pattern
@@ -1418,7 +1413,7 @@ function IsDuplicateItem(it)
 
     if isComparable then
       local curEgo = cur.branded and cur:ego() or "plain"
-	    local curPlus = cur.plus or 0
+      local curPlus = cur.plus or 0
       if ego == curEgo and plus <= curPlus then
         -- Update highest enchantment with inventory item
         sameType[ego] = curPlus
@@ -1737,6 +1732,7 @@ slot += Fireball:f
 slot += Apportation:g
 slot += Sublimation of Blood:m
 slot += Slow:s
+slot += Blink:B
 slot += Sticky Flame:s
 slot += Swiftness:s
 slot += Passwall:w
@@ -1746,6 +1742,7 @@ slot += Mephitic Cloud:x
 slot += Vampiric Draining:x
 slot += Iskenderun's Battlesphere:z
 slot += Lee's Rapid Deconstruction:z
+slot += Yara's Violent Unravelling: z
 slot += Animate Dead:A
 slot += Animate Skeleton:A
 slot += Ozocubu's Armour:A
@@ -1757,8 +1754,8 @@ slot += Fugue of the Fallen:S
 #                            Auto Pickup                             #
 ######################################################################
 
-# Gold, scrolls, potions, books, jewellery, wands, gems, staves, orbs, misc
-autopickup = $?!:"/♦|0}
+# Gold, scrolls, potions, books, jewellery, wands, gems, staves, misc
+autopickup = $?!:"/â™¦|}
 
 ae := autopickup_exceptions
 ae += <curare-tipped dart
