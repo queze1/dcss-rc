@@ -185,6 +185,61 @@ function FelidZF()
   end
 end
 
+-- Hold alt when walking to shout before walking and stop if any monsters shout back
+local noise_warning = false
+local next_direction
+
+-- Create a shout walk function for a direction
+function ShoutWalkCreator(direction)
+  return function()
+    -- Do not shout walk if monsters are in LOS
+    if IsEnemyInLOS() then
+      crawl.mpr("There are monsters nearby!", 5)
+      return
+    end
+
+    -- If a monster has made a noise in the last shout walk, prompt whether to shout walk anyway
+    if noise_warning then
+      if not crawl.yesno("Your last walk was canceled because a monster made a noise. Continue anyway?") then
+        return
+      end
+    end
+
+    -- Shout, then set walking direction for next turn
+    crawl.sendkeys("tt")
+    next_direction = direction
+  end
+end
+
+
+-- Manages the state tracking
+function ShoutWalkManager()
+  -- Reset the noise warning and direction at the start of every turn
+  direction = next_direction
+  noise_warning = false
+  next_direction = nil
+  
+  if not next_direction then
+    return
+  end
+
+  -- Abort if an enemy is in LOS
+  if IsEnemyInLOS() then
+    crawl.mpr("A monster has walked into LOS. Walk canceled.", 3)
+    return
+  end
+
+  -- Abort if a noise was made
+  local noise_made = FindMessage("You hear", "for attention")
+  if noise_made then
+    crawl.mpr("A noise has been made in response. Walk canceled.", 3)
+    noise_warning = true
+    return
+  end
+  
+  crawl.sendkeys(direction)
+end
+
 -- =========================
 -- CUSTOM HOOKS
 -- =========================
@@ -213,7 +268,9 @@ end
 
 function ready()
   OpenSkills()
+
   AutoExcludeUpstairs()
+  ShoutWalkManager()
 end
 }
 
@@ -222,7 +279,17 @@ end
 #                               Macros                               #
 ######################################################################
 
-## Spells
+# Shout walk
+macros += M \{25} ===shout_walk_y 
+macros += M \{21} ===shout_walk_u 
+macros += M \{8} ===shout_walk_h 
+macros += M \{2} ===shout_walk_b 
+macros += M \{14} ===shout_walk_n 
+macros += M \{10} ===shout_walk_j 
+macros += M \{11} ===shout_walk_k 
+macros += M \{12} ===shout_walk_l 
+
+# Spells
 macros += M 1 za
 macros += M 2 zb
 macros += M 3 zc
@@ -234,6 +301,6 @@ macros += M 9 zh
 macros += M w ===FelidZF
 macros += M e ze
 
-## Safe exploring
+# Safe explore
 macros += M o ===SafeExplore
 
