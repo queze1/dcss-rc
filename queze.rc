@@ -1,20 +1,29 @@
 ######################################################################
 #                          General Settings                          #
 ######################################################################
+
+# Sets skill training to manual
 default_manual_training = true
 
-autofight_stop = 70
-show_more = false
-
+## Travel and autopickup
 travel_delay = -1
 explore_delay = -1
 rest_delay = -1
 explore_stop += greedy_items
 travel_open_doors = true
-
 drop_disables_autopickup = true
 
+autofight_stop = 70
+bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
+
+hp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
+mp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
+tile_show_threat_levels = tough, nasty, unusual
+
+show_more = false
 force_more_message += into view
+force_more_message += Your unholy channel is weakening.
+force_more_message += Found a staircase to the Ecumenical Temple
 
 confirm_action += Death's Door
 confirm_action += Revivification
