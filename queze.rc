@@ -219,7 +219,7 @@ function ShoutWalkManager()
   noise_warning = false
   next_direction = nil
   
-  if not next_direction then
+  if not direction then
     return
   end
 
