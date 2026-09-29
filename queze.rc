@@ -84,7 +84,7 @@ function IsEnemyInLOS()
   return false
 end
 
--- Helper function which finds a message in the buffer which contains a pattern
+-- Helper function which finds a message in the buffer containing a pattern
 -- If a message matches the stop pattern, then return nil
 function FindMessage(match, stop)
   local counter = 1
@@ -132,8 +132,6 @@ end
 -- Helper function returning true if it's safe to rest
 function IsSafe()
   local feature = view.feature_at(0, 0)
-  hp, mhp = you.hp()
-  mp, mmp = you.mp()
   if IsUpstair(feature) then
     return true
   end
