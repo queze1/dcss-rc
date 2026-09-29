@@ -138,11 +138,241 @@
   end
 >
 
+
+######################################################################
+#                          General Settings                          #
+######################################################################
+
+# Sets skill training to manual
+default_manual_training = true
+
+# Force uppercase Y on dangerous questions
+easy_confirm            = safe
+
+# 'W'ear will also allow you to 'T'ake off worn armour, and vice versa, and the same is true for 'P'utting on / 'R'emoving jewellery
+equip_unequip           = true
+
+# How long auto-explore waits after each move (milliseconds)
+explore_delay           = -1
+
+hp_colour               = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
+
+mp_colour               = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
+
+# Logs chat messages into the notes
+note_chat_messages      = true
+
+# How long resting waits after each move (milliseconds)
+rest_delay              = -1
+
+# If true, only stop resting when both HP/MP are full
+rest_wait_both          = true
+
+# Try it. Shows 'more' prompts when outputting more than one screen of messages
+show_more               = false
+
+# Highlights the path taking during autoexplore or travel
+show_travel_trail       = true
+
+# If true, disables smart targeting for explosion and bouncing bolt spells
+simple_targeting        = false
+
+# Items are sorted according to: equipped, basename, qualname, curse, qty
+sort_menus              = true
+
+stat_colour             = 3:red, 7:lightred
+
+# How long travel waits after each move (milliseconds)
+travel_delay            = -1
+
+# Prefixes manually added notes with the -- string, to make them easier to find
+user_note_prefix        = --
+
+# Controls the speed of animations
+view_delay              = 100
+
+# Adjusts how much autoexplore favours attempting to discover room perimeters and corners.
+# At values higher than 0, autoexplore will more heavily favour visiting squares that are next to walls
+# reasonable values range from 0 to 10 maybe?
+# Try it.
+#explore_wall_bias       = 3
+
+## Implojin
+prompt_menu = false
+# try to prevent autopick from being interrupted during zig cleanup?
+travel_key_stop = false
+#tile_key_repeat_delay = 150
+
+## me
+rest_wait_ancestor = true
+tile_show_threat_levels = tough, nasty, unusual
+bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
+fail_severity_to_confirm = 0
+more += Found a staircase to the Ecumenical Temple
+more += You add the spells
+more += forbidden knowledge
+more += Your unholy channel is weakening.
+
+
+######################################################################
+#                           Character Dump                           #
+######################################################################
+
+dump_order     = header, hiscore, stats, misc, inventory, skills, spells
+dump_order    += overview, mutations, messages, screenshot, skill_gains
+dump_order    += notes, turns_by_place, kills_by_place
+dump_order    += action_counts, kills, monlist, vaults
+
+dump_book_spells = false
+ood_interesting = 6
+note_hp_percent = 25
+note_all_skill_levels = true
+note_xom_effects = true
+note_items += of Zot,rod,acquirement
+note_messages += Your scales start
+note_messages += protects you from harm
+note_messages += You fall through a shaft
+note_messages += [bB]anish.*Abyss
+
+# Use the notes in the character dump to spoil information about whether an
+# enemy has been seen before (i.e. have I now killed the same demonologist
+# from which I have fled earlier or was this a different one?).
+note_monsters += Brimstone Fiend
+note_monsters += Ice Fiend
+note_monsters += Tzitzimitl
+note_monsters += caustic shrike
+note_monsters += curse skull
+note_monsters += curse toe
+note_monsters += deep elf demonologist
+note_monsters += deep elf sorcerer
+note_monsters += entropy weaver
+note_monsters += lich
+note_monsters += ancient lich
+note_monsters += pearl dragon
+note_monsters += orb of fire
+
+
+######################################################################
+#                             Spell Slots                            #
+######################################################################
+
+# Set Alias for Spell Slots
+slot := spell_slot
+
+slot += Fireball:f
+slot += Apportation:g
+slot += Sublimation of Blood:m
+slot += Slow:s
+slot += Sticky Flame:s
+slot += Swiftness:s
+slot += Passwall:w
+slot += Corona:v
+slot += Iskenderun's Mystic Blast:x
+slot += Mephitic Cloud:x
+slot += Vampiric Draining:x
+slot += Iskenderun's Battlesphere:z
+slot += Lee's Rapid Deconstruction:z
+slot += Animate Dead:A
+slot += Animate Skeleton:A
+slot += Ozocubu's Armour:A
+slot += Death's Door:D
+slot += Borgnjor's Revivification:R
+slot += Fugue of the Fallen:S
+
+######################################################################
+#                            Auto Pickup                             #
+######################################################################
+
+autopickup = $?!:"/%}|\
+
+autopickup_exceptions += unknown magical staves
+autopickup_exceptions ^= <lamp of fire,<phial of floods,<fan of gales,<box of beasts,<lightning rod,<phantom mirror,<figurine of a ziggurat,<sack of spiders,<tin of tremorstones,<condenser vane
+
+
+############################################################################
+#                            Auto Inscriptions                             #
+############################################################################
+
+# Set Alias
+ai := autoinscribe
+
+# Inscribe distortion weapons if you are not worshipping Lugonu
+: if you.god() ~= "Lugonu" then
+    ai += distortion:!w
+  ai += (Sonja|Psyche):!w
+: end
+
+
+# Consumables
+ai += (bad|dangerous)_item.*potion:!q
+ai += potions? of berserk rage:!q
+ai += potions? of mutation:!q
+ai += (bad|dangerous)_item.*scroll:!r
+ai += scrolls? of blinking:!r
+ai += scrolls? of revelation:!r
+ai += scrolls? of vulnerability:!r
+
+# Body Armour
+ai += fire dragon (armour|hide):rF++, rC-
+ai += gold dragon (armour|hide):rC+, rF+, rPois
+ai += ice dragon (armour|hide):rC++, rF-
+ai += pearl dragon (armour|hide):rN+
+ai += quicksilver dragon armour:Will+
+ai += shadow dragon (armour|hide):Stlth++++
+ai += steam dragon (armour|hide):rSteam
+ai += storm dragon (armour|hide):rElec
+ai += swamp dragon (armour|hide):rPois
+ai += troll (hide|leather armour):Regen
+
+# Body Armour Egos
+ai += ([^l] leather armour|mail|plate armour|robe|skin) of cold resistance:rC+
+ai += ([^l] leather armour|mail|plate armour|robe|skin) of fire resistance:rF+
+ai += (leather armour|mail|plate armour|robe) of willpower:Will+
+ai += (leather armour|mail|plate armour|robe) of positive energy:rN+
+ai += (leather armour|mail|plate armour) of poison resistance:rPois
+ai += plate armour of ponderousness:Speed-
+ai += robe of resistance:rC+, rF+
+ai += troll leather armour of cold resistance:rC+
+ai += troll leather armour of fire resistance:rF+
+
+# Accessory Egos
+ai += (barding|boots) of flight:+Fly
+ai += (buckler|shield) of protection:AC+3
+ai += (buckler|shield) of resistance:rC+, rF+
+ai += hat of spirit shield:Spirit
+
+# Amulets
+ai += amulet of faith:Faith, !P
+
+# Rings
+ai += ring of fire:rF+, rC-
+ai += ring of ice:rC+, rF-
+ai += ring of magical power:MP+9
+ai += ring of poison resistance:rPois
+ai += ring of positive energy:rN+
+ai += ring of protection from cold:rC+
+ai += ring of protection from fire:rF+
+ai += ring of willpower:Will+
+#ai += ring of see invisible:sI
+ai += ring of stealth:Stlth+
+ai += ring of wizardry:Wiz+
+
+# Staves
+ai += staff of air:rElec
+ai += staff of cold:rC+
+ai += staff of death:rN+
+ai += staff of fire:rF+
+ai += staff of alchemy:rPois
+ai += staff of wizardry:Wiz+
+
+show_god_gift = unident
+
+
 ######################################################################
 #                        Custom Lua Functions                        #
 ######################################################################
 
-## Threat detection from Implojin
+## thanks Implojin
 
 # we dynamically re-set travel_open_doors in multiple places below
 travel_open_doors = avoid
@@ -165,11 +395,6 @@ flash_screen_message += T3
 
 
 {
--- State variables for Crawl hooks  
-local ignore_upstair_exclusion = false
-local retreated = false
-
-
 -- begin threat warning lua
 local DEBUG_MONS_STATUS = false
 local DEBUG_MONS_FLAGS = false
@@ -199,15 +424,6 @@ local known_threats = {}
 -- Level 3 alert if that is above your HP, level 2 alert if that is above your HP two times
 
 
--- Function to split a comma-separated string into a table
-function split_string(input_str, sep)
-    local t = {}
-    for str in string.gmatch(input_str, "([^" .. sep .. "]+)") do
-        table.insert(t, str)
-    end
-    return t
-end
-
 -- Check if an ability exists within the monster's spellbook.
 -- This checks innate/demonic abilities and spells, but cannot check draconian breath abilities.
 -- The third parameter is optional, and tests if the ability deals more than the given damage.
@@ -221,8 +437,7 @@ function check(mons, ability_string, damage)
     books = mons:spells()
     if books ~= nil then
         for _,book in ipairs(books) do
-            -- Was a table before, now is a string, guessing that it is comma separated
-            for _,spell in ipairs(split_string(book, ",")) do
+            for _,spell in ipairs(book) do
                 if spell == ability_string then
                     if damage ~= nil then
                         return check_abil_dam(mons, ability_string) > damage
@@ -626,6 +841,7 @@ local status = {
         if DEBUG_MONS_TARGET_DESC == true then crawl.mpr(mons:name() .. " target_desc: " .. mons:target_desc() ) end
         if DEBUG_LOF_PATH == true then check_lof(mons, "Magic Dart") end
 
+
 -- begin danger table
         -- TODO: Fill out the remaining danger conditions:
         -- Need to finish adding all missing high danger monster spells,
@@ -787,7 +1003,7 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- queze
-	      {conditions = {check_desc(mons, "extra damage"), you.branch() ~= "Zig"},
+	{conditions = {check_desc(mons, "extra damage"), you.branch() ~= "Zig"},
                tier = 2,
              reason = "Can deal extra damage at range, careful!"} ,
         -- TODO: Warn smite at 50hp or lower
@@ -803,8 +1019,8 @@ local status = {
              reason = "Petrifier in LOF " .. (check_abil_pct(mons, "Petrify") or "buggy") .. "%, equip more Will?"} ,
         {conditions = {check_abil_pct(mons, "Avatar Song") ~= nil and check_abil_pct(mons, "Avatar Song") > 5},
                tier = 3,
-             reason = "Mesmeriser in LOS " .. (check_abil_pct(mons, "Avatar Song") or "buggy") .. "%, equip more Will?"} ,
-	      {conditions = {check(mons, "Blink Allies Encircling"), you.branch() ~= "Zig"},
+             reason = "Mesmeriser in LOF " .. (check_abil_pct(mons, "Avatar Song") or "buggy") .. "%, equip more Will?"} ,
+	{conditions = {check(mons, "Blink Allies Encircling"), you.branch() ~= "Zig"},
                tier = 2,
              reason = "Encircling blink in LOS, watch out!"} , }
 
@@ -819,7 +1035,8 @@ local status = {
         -- maybe do the same thing if it's OOD? or tripping any huge damage / rF+++ flags?
         -- TODO: I need to add active status warnings for dangerous player status to this script;
         -- things like petrifying or howl or standing-in-dangerous-cloud or mark
-        for _, entry in ipairs(danger_table) do
+
+        for _,entry in ipairs(danger_table) do
             assert(type(entry.conditions) == "table" and type(entry.tier) == "number" and type(entry.reason) == "string")
         end
 -- end danger table
@@ -979,9 +1196,6 @@ end
 -- "travel_open_doors = avoid" ordinarily causes problems with closed doors and interlevel travel.
 -- This permits autotravel to open doors that are in the way, when issuing G> and X> commands.
 function ch_start_running(runmode)
-    -- For SafeExplore, set flag on Shift+Dir run/level map travel/rest/...
-    retreated = true
-
     if runmode == "intertravel" then
         crawl.setopt("travel_open_doors = open")
     end
@@ -1002,20 +1216,12 @@ function c_answer_prompt(prompt)
     if prompt:find("Could not pick up") then
         force_autoexplore_stop = true
     end
-
-    -- skip exclusion prompt from SafeUpstairs
-    if prompt:find("Enter next level anyway") and FindMessage("This staircase is marked as excluded", "There is a") and ignore_upstair_exclusion then
-        ignore_upstair_exclusion = false
-        return true
-    end
 end
 
 -- end threat warning lua
 
 
--- begin helper lua
-
--- Helper function calculating distance from player
+-- HELPER FUNCTIONS
 function DistToPlayer(x, y)
   return math.abs(x) + math.abs(y)
 end
@@ -1026,29 +1232,10 @@ function LOSCoords()
   local coords = {}
   for x = -you.los(), you.los() do
     for y = -you.los(), you.los() do
-	    table.insert(coords, {x = x, y = y})
-	  end
+	  table.insert(coords, {x = x, y = y})
+	end
   end
   return coords
-end
-
--- Helper function returning true if a feature is an upstairs
-function IsUpstair(feature)
-  if feature == nil then
-    return false
-  elseif string.find(feature, "stairs_up") then
-    return true
-  elseif string.find(feature, "escape_hatch_up") then
-    return true
-  elseif string.find(feature, "exit_") then
-    return true
-  end
-  return false
-end
-
--- Helper function returning true if a feature is a downstairs
-function IsDownstair(feature)
-  return string.find(feature, "stairs_down")
 end
 
 -- Helper function returning true if a hostile creature is in LOS
@@ -1077,10 +1264,29 @@ function IsHealthy()
   return true
 end
 
+-- Helper function returning true if a feature is an upstairs
+function IsUpstair(feature)
+  if feature == nil then
+    return false
+  elseif string.find(feature, "stairs_up") then
+    return true
+  elseif string.find(feature, "escape_hatch_up") then
+    return true
+  elseif string.find(feature, "exit_") then
+    return true
+  end
+  return false
+end
+
 -- Helper function returning true if it's safe to rest
 function IsSafe()
-  local onUpstair = IsUpstair(view.feature_at(0, 0))
-  return onUpstair or IsHealthy()
+  local feature = view.feature_at(0, 0)
+  hp, mhp = you.hp()
+  mp, mmp = you.mp()
+  if IsUpstair(feature) then
+    return true
+  end
+  return IsHealthy()
 end
 
 -- Helper function which finds a message in the buffer which contains a pattern
@@ -1095,58 +1301,78 @@ function FindMessage(match, stop)
 
     if string.find(message, match) then
       return message
-    elseif string.find(message, stop) then
+    end
+    if string.find(message, stop) then
       return
     end
   end
 end
 
--- Helper function which gets the base name of an item
-function GetBaseName(it)
-  -- item.name still retains inscriptions, so remove using pattern
-  -- Match everything that precedes the first '{' (if any), trimming any extra whitespace
-  local base_name = it.name("qual"):match("^[^{]+"):gsub("%s*$", "")
-  return base_name
+
+-- Opens skill menu at the beginning of the game
+local need_skills_opened = true
+function OpenSkills()
+  if you.turns() == 0 and need_skills_opened then
+    need_skills_opened = false
+    crawl.sendkeys("m")
+  end
 end
 
--- Helper function which prints a table recursively
-function PrintTable(tbl, indent)
-  -- Set the initial indentation (used for recursive calls)
-  indent = indent or 0
-  local indent_str = string.rep("  ", indent)
 
-  -- Iterate over indexed elements using `ipairs`
-  for i, v in ipairs(tbl) do
-    if type(v) == "table" then
-      crawl.mpr(indent_str .. "[" .. i .. "] => Table {")
-      -- Recursively print the nested table
-      PrintTable(v, indent + 1)
-      crawl.mpr(indent_str .. "}")
-    else
-      crawl.mpr(indent_str .. "[" .. i .. "] => " .. tostring(v))
-    end
+--Settings
+--Change over/under to the desired ability/item to quiver,
+--same syntax as macros
+
+--ex: setting over "Qa" would quiver whatever is on the "a" slot
+--in the quiver menu whenever you are over 5 tiles away from a monster
+--TODO: add more things to autoquiver
+-- credits to yeahireadbooks
+
+local aq_cfg = { toggle = -1, threshold = 1, under = "Q&a" }
+
+function ToggleAutoQuiver()
+  aq_cfg.toggle = aq_cfg.toggle * -1
+  if aq_cfg.toggle > 0 then crawl.mpr("AutoQuiver is now on.") else crawl.mpr("AutoQuiver is now off.") end
+end
+
+function AutoQuiver()
+  if (you.god() == "Makhleb" and you.piety_rank() >= 2 and aq_cfg.toggle == -1) then
+    aq_cfg = { toggle = 1, threshold = 5, under = "Q&a" }
+    crawl.mpr("AutoQuiver automatically turned on.")
   end
 
-  -- Iterate over non-indexed elements using `pairs`
-  for k, v in pairs(tbl) do
-    -- Check if this table entry was already covered by `ipairs`
-    if type(k) ~= "number" or k > #tbl then
-      if type(v) == "table" then
-        crawl.mpr(indent_str .. tostring(k) .. " => Table {")
-        -- Recursively print the nested table
-        PrintTable(v, indent + 1)
-        crawl.mpr(indent_str .. "}")
-      else
-        crawl.mpr(indent_str .. tostring(k) .. " => " .. tostring(v))
+  if aq_cfg.toggle == -1 then
+    return
+  end
+
+  local slot = nil
+  for it in iter.invent_iterator:new(items.inventory()) do
+      if it and it.name():find("stone") then
+        slot = items.index_to_letter(it.slot)
+        break
       end
+  end
+  if slot == nil then return end
+
+  local x,y
+  for _, c in ipairs(LOSCoords()) do
+    m = monster.get_monster_at(c.x, c.y)
+    if IsEnemyHostile(m) then
+      local dist = DistToPlayer(c.x, c.y)
+      if dist <= aq_cfg.threshold then
+        crawl.process_keys(aq_cfg.under)
+      elseif dist > aq_cfg.threshold then
+        crawl.process_keys("i"..slot.."q")
+      end
+      return
     end
   end
 end
 
--- end helper lua
 
+-- Hold alt when walking to shout before walking and stop if any monsters shout back
+-- TODO: Change to run in a line until interupted
 
--- Hold ctrl when walking to shout before walking and stop if any monsters shout back
 local noise_warning = false
 local last_action
 local next_direction
@@ -1183,6 +1409,7 @@ function ShoutWalkCreator(direction)
   end
 end
 
+
 -- Manages the state tracking
 function ShoutWalkManager()
   -- Reset the noise warning at the start of every turn
@@ -1203,7 +1430,7 @@ function ShoutWalkManager()
   if last_action == "shout" then
     local message
     local finished = false
-	  -- Finds a message with "You hear", stopping when one is found with "for attention"
+	-- Finds a message with "You hear", stopping when one is found with "for attention"
     local noise_made = FindMessage("You hear", "for attention")
 		
     -- Abort if a noise was made
@@ -1247,8 +1474,8 @@ end
 -- Set up shout walk functions
 ShoutWalkMapper()
 
-
 -- Safe exploring
+local retreated = false
 function SafeExplore()
   -- Do not allow exploring if you have a sentinel's mark
   -- Not sure why you.status() doesn't work
@@ -1263,24 +1490,51 @@ function SafeExplore()
     retreated = false
   
   -- If you are not safe, then prompt to retreat
-  else  
-    -- Point to stairs if within LOS
+  else
+    retreated = true
+  
     for _, c in ipairs(LOSCoords()) do
       if IsUpstair(view.feature_at(c.x, c.y)) then
-	      crawl.sendkeys("X<")
-		    return
-	    end
+	    crawl.sendkeys("X<")
+		return
 	  end
-
-    -- Otherwise, just open level map
+	end  
     crawl.sendkeys("X")
   end
 end
 
+
+-- This forces you to check where you're going downstairs (broken)
+local peeking = false
+
+function PeekDownstairs()
+  if not string.find(view.feature_at(0, 0), "stairs_down") then
+    crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+  else
+    crawl.sendkeys("X]")
+    peeking = true
+  end
+end
+
+function LevelMapDownstairs()
+  if peeking then
+    crawl.do_commands({"CMD_MAP_EXIT_MAP", "CMD_GO_DOWNSTAIRS"})
+    peeking = false
+  else
+    crawl.do_commands({"CMD_MAP_FIND_DOWNSTAIR"})
+  end
+end
+
+function LevelMapExit()
+  peeking = false
+  crawl.do_commands({"CMD_MAP_EXIT_MAP"})
+end
+
+
 -- Prompts when going downstairs when not full hp/full mp/no magic contamination
 -- TODO: Allow going downstairs when not at full MP when ADead/DChan is applied
 function SafeDownstairs()
-  if not IsDownstair(view.feature_at(0, 0)) then
+  if not string.find(view.feature_at(0, 0), "stairs_down") then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
   elseif IsSafe() then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
@@ -1290,34 +1544,13 @@ function SafeDownstairs()
 end
 
 
--- If an enemy is in LOS while going upstairs, exclude all upstairs in LOS as dangerous before going
-
-function SafeUpstairs()
-  -- If not on upstairs, trigger default error message
-  if not IsUpstair(view.feature_at(0, 0)) then
-    crawl.do_commands({"CMD_GO_UPSTAIRS"})
-    return
-  end
-
+-- Excludes all upstairs in LOS if an enemy is in LOS
+function AutoExcludeUpstairs()
   for _, c in ipairs(LOSCoords()) do
     if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
       if IsEnemyInLOS() then
         travel.set_exclude(c.x, c.y, 2)
-        -- Temporarily ignore "This staircase is marked as excluded" for this turn
-        ignore_upstair_exclusion = true
-      end
-    end
-  end
-
-  crawl.do_commands({"CMD_GO_UPSTAIRS"})
-end
-
-
--- Remove all exclusions on upstairs in LOS if no enemy is in LOS
-function RemoveUpstairExclusions()
-  for _, c in ipairs(LOSCoords()) do
-    if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
-      if not IsEnemyInLOS() then
+      else
         travel.del_exclude(c.x, c.y)
       end
     end
@@ -1335,252 +1568,67 @@ function FelidZF()
 end
 
 
--- Opens skill menu at the beginning of the game
-local need_skills_opened = true
-function OpenSkills()
-  if you.turns() == 0 and need_skills_opened then
-    need_skills_opened = false
-    crawl.sendkeys("m")
-  end
+-- Equipment autopickup (partly from gammafunk rc)
+-- Do not pick up duplicates of a dropped non-artifact ring (by me)
+
+-- Resets dropped rings at the start of each game
+if you.turns() == 0 or c_persist.dropped_rings == nil then
+  c_persist.dropped_rings = {}
 end
 
-
--- Equipment autopickup
--- TODO: Magical staves, pick up if new and gives a useful resist OR has a spell which would be enhanced by it
--- TODO: If you have created an item stash (0 waypoint in Lair:1), and have 0/1 slots remaining, temporarily turn off autopickup for scrolls/potions in the stash? (with an info message ofc)
-
--- Reset tables at the start of each game
-if you.turns() == 0 or c_persist.dropped_rings == nil then c_persist.dropped_rings = {} end
-if you.turns() == 0 or c_persist.item_enchantments == nil then c_persist.item_enchantments = {} end
-
--- Weightless (0): 0, Light (1-5): 1, Medium (6-11): 2, Heavy (12-99): 3
-function WeightClass(it)
-  if it == nil then
-    return 0
-  elseif it.encumbrance == 0 then
-    return 0
-  elseif it.encumbrance <= 5 then
-    return 1
-  elseif it.encumbrance <= 11 then
-    return 2
-  else
-    return 3
+function autopickup(it, name)
+  if it.is_useless then
+    return
   end
-end
-
--- None: 0, Plain: 1, Branded: 2, Artefact: 3
-function RarityClass(it)
-  if it == nil then
-    return 0
-  elseif it.artefact then
-    return 3
-  elseif it.branded then
-    return 2
-  elseif it:class(true) == "Magical Staves" then
-    -- Magical staves are unbranded, but still special
-    return 2
-  else
-    return 1
-  end
-end
-
--- Check if an item with the same type, same ego and higher enchantment already exists
--- Note: Can't check if floor item has a strictly greater enchantment, otherwise the table will be immediately updated and it will never be picked up, no hook which triggers when an item is picked up, so compare with table and inventory
-function IsDuplicateItem(it)
   if it.artefact then
+    return
+  end
+  
+  local class = it:class(true)
+  if class == "armour" then
+    local good_slots = {cloak="Cloak", helmet="Helmet",
+                        gloves="Gloves", boots="Boots"}
+    st, _ = it.subtype()
+
+    -- Autopickup found aux armour if 1) we don't have any or 2) it's artefact,
+    -- or 3) if we don't have artefact or ego armour, and the found armour is
+    -- ego.
+    if good_slots[st] ~= nil then
+      if good_slots[st] == "Gloves" and you.has_claws() > 0 then return end
+
+      if it.artefact then return true end
+
+      local cur = items.equipped_at(good_slots[st])
+      if cur == nil then return true end
+
+      if cur.branded or cur.artefact then return end
+      if it.branded then return true end
+      -- Autopickup found body armour of the same kind we're wearing, according
+      -- to conditions (2) and (3) above used for aux slots.
+    elseif st == "body" then
+      local cur = items.equipped_at("armour")
+      if cur == nil then return true end
+      if cur.name("qual") ~= it.name("qual") then return end
+
+      if it.artefact then return true end
+
+      if cur.branded or cur.artefact then return end
+      if it.branded then return true end
+	end
+  elseif class == "Jewellery" and util.contains(c_persist.dropped_rings, it:ego()) then
     return false
   end
-
-  -- Create table if it doesn't exist
-  if c_persist.item_enchantments[GetBaseName(it)] == nil then
-    c_persist.item_enchantments[GetBaseName(it)] = {}
-  end
-
-  local sameType = c_persist.item_enchantments[GetBaseName(it)]
-  local ego = it.branded and it:ego() or "plain"
-  local plus = it.plus or 0
-  
-  -- Compare with table, if enchantment is lower, skip
-  if sameType[ego] ~= nil then
-    if plus < sameType[ego] then
-      return true
-    end
-  end
-
-  -- Compare with inventory, if enchantment is lower or equal, skip
-  for _, cur in ipairs(items.inventory()) do
-    local isComparable = GetBaseName(it) == GetBaseName(cur) and not cur.artefact
-
-    if isComparable then
-      local curEgo = cur.branded and cur:ego() or "plain"
-      local curPlus = cur.plus or 0
-      if ego == curEgo and plus <= curPlus then
-        -- Update highest enchantment with inventory item
-        sameType[ego] = curPlus
-        return true
-      end
-    end
-  end
-
-  -- Otherwise, update highest enchantment with floor item
-  sameType[ego] = plus
-  return false
 end
 
--- Armour pickup logic
--- Pick if (not duplicate) AND (same weight class) AND (equal or higher rarity)
-function ShouldPickArmour(it)
-    if IsDuplicateItem(it) then
-      return false
-    end
-
-    local cur = items.equipped_at(it.equip_type)
-    local equal_weight = WeightClass(it) == WeightClass(cur)
-    local greater_rarity = RarityClass(it) >= RarityClass(cur)
-    if equal_weight and greater_rarity then
-      return true
-    end
-end
-
--- Handles updating dropped rings
 function DropItem()
   crawl.do_commands({"CMD_DROP"})
   if you.floor_items() == nil then
     return
   end
 
-  for _, it in ipairs(you.floor_items()) do
-    if not it.artefact and it:class(true) == "Jewellery" and it.dropped then
-      c_persist.dropped_rings[it:ego()] = true
-    end
-  end
-end
-
--- Ring pickup logic
--- Do not pick up duplicates of a dropped non-artefact ring
-function ShouldPickRing(it)
-  if not it.artefact and c_persist.dropped_rings[it:ego()] ~= nil then
-    return false
-  end
-end
-
--- Check all weapon skills to determine if "interested" (i.e. has trained any weapon skill)
-function InterestedInWeapons()
-  local weapon_skills = {"Maces & Flails", "Axes", "Polearms", "Staves", "Short Blades", "Long Blades", "Ranged Weapons"}
-  for _, skill in ipairs(weapon_skills) do
-    if you.skill(skill) > 0 then
-      return true
-    end
-  end
-  return false
-end
-
--- Weapon pickup logic
-function ShouldPickWeapon(it)
-  -- 1. Always pick up artefacts
-  if it.artefact then
-    return true
-  end
-
-  -- 2. Skip duplicates
-  if IsDuplicateItem(it) then
-    return false
-  end
-
-  -- 3. If no weapon equipped, pick up any weapon if 0 UC skill and D:1 (casters at game start)
-  local cur = items.equipped_at("Weapon")
-  if cur == nil then
-    return you.skill("Unarmed Combat") == 0 and you.where() == "D:1"
-  end
-
-  local isPreferred
-  -- 4. If 0 weapon skills, prefer fast weapons if 0 Summonings skill, otherwise prefer reach weapons
-  if not InterestedInWeapons() then
-    if you.skill("Summonings") == 0 then
-      isPreferred = it.delay <= 10
-    else
-      isPreferred = it.reach_range > 1
-    end
-  else
-    -- 5. If interested in weapons, prefer weapons using the same skill
-    isPreferred = it.weap_skill == cur.weap_skill
-  end
-
-  -- 6. If preferred, pick up if equal or greater rarity
-  if isPreferred then
-    return RarityClass(it) >= RarityClass(cur)
-  else
-    -- 7. If not preferred, only pick up if greater rarity
-    return RarityClass(it) > RarityClass(cur)
-  end
- 
-  return
-end
-
--- "yes pickup": true, "no pickup": false, "no opinion": nil
-function autopickup(it, name)
-  if it.is_useless then
-    return
-  end
-  
-  local class = it:class(true)
-  if class == "Armour" then
-    return ShouldPickArmour(it)
-  elseif class == "Jewellery" then
-    return ShouldPickRing(it)
-  elseif class == "Hand Weapons" then
-    return ShouldPickWeapon(it)
-  end
-end
-
--- Helper to show autopickup logic
--- TODO: Add debug option to ShouldPick functions and print using that?
-function DebugAutopickup()
-  if you.floor_items() == nil then
-    return
-  end
-
-  crawl.mpr("Item enchantments table: ")
-  PrintTable(c_persist.item_enchantments)
-
-  for _, it in ipairs(you.floor_items()) do
-    local class = it:class(true)
-
-    if class == "Armour" then
-      local isDuplicatemsg = IsDuplicateItem(it) and "is" or "is not"
-      local pickupMsg = ShouldPickArmour(it) and "would" or "would not"
-
-      crawl.mpr(it.name() .. " " .. isDuplicatemsg .. " a duplicate.")
-      crawl.mpr("This armour " .. pickupMsg .. " be picked up by autopickup.")
-    elseif class == "Jewellery" then
-      local isDropped = c_persist.dropped_rings[it:ego()] ~= nil
-      local isDroppedMsg = isDropped and "has" or "has not"
-      crawl.mpr(it:ego() .. " ego " .. isDroppedMsg .. " been dropped.")
-    elseif class == "Hand Weapons" then
-      local cur = items.equipped_at("Weapon")
-      local preferReason
-      local isPreferred
-      if not InterestedInWeapons() then
-        if you.skill("Summonings") == 0 then
-          preferReason = "fast"
-          isPreferred = it.delay <= 10
-        else
-          preferReason = "reach"
-          isPreferred = it.reach_range > 1
-        end
-      else
-        preferReason = "same skill"
-        isPreferred = it.weap_skill == cur.weap_skill
-      end
-
-      local pickupMsg = ShouldPickWeapon(it) and "would" or "would not"
-      local isPreferredMsg = isPreferred and "is" or "is not"
-      local isDuplicatemsg = IsDuplicateItem(it) and "is" or "is not"
-
-      crawl.mpr("You prefer " .. preferReason .. " weapons.")
-      crawl.mpr(it.name() .. " " .. isPreferredMsg .. " preferred.")
-      crawl.mpr(it.name() .. " " .. isDuplicatemsg .. " a duplicate.")
-      crawl.mpr("This weapon " .. pickupMsg .. " be picked up by autopickup.")
+  for _, item in ipairs(you.floor_items()) do
+    if not item.artifact and item:class(true) == "Jewellery" and item.dropped then
+      table.insert(c_persist.dropped_rings, item:ego())
     end
   end
 end
@@ -1590,8 +1638,9 @@ function ready()
   AnnounceDamage()
   OpenSkills()
 
-  ShoutWalkManager()
-  RemoveUpstairExclusions()
+  AutoQuiver()
+  --ShoutWalkManager()
+  AutoExcludeUpstairs()
 
   --threat warning
   if DEBUG_YOU_STATUS == true then crawl.mpr(you.status() .. " || " .. you.transform()) end
@@ -1599,249 +1648,6 @@ function ready()
 end
 }
 
-######################################################################
-#                          General Settings                          #
-######################################################################
-
-# Sets skill training to manual
-default_manual_training = true
-
-# Force uppercase Y on dangerous questions
-easy_confirm            = safe
-
-# 'W'ear will also allow you to 'T'ake off worn armour, and vice versa, and the same is true for 'P'utting on / 'R'emoving jewellery
-equip_unequip           = true
-
-# How long auto-explore waits after each move (milliseconds)
-explore_delay           = -1
-
-hp_colour               = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
-
-mp_colour               = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
-
-# Logs chat messages into the notes
-note_chat_messages      = true
-
-# How long resting waits after each move (milliseconds)
-rest_delay              = -1
-
-# If true, only stop resting when both HP/MP are full
-rest_wait_both          = true
-
-# Try it. Shows 'more' prompts when outputting more than one screen of messages
-show_more               = false
-
-# Highlights the path taking during autoexplore or travel
-show_travel_trail       = true
-
-# If true, disables smart targeting for explosion and bouncing bolt spells
-simple_targeting        = false
-
-# Items are sorted according to: equipped, basename, qualname, curse, qty
-sort_menus              = true
-
-stat_colour             = 3:red, 7:lightred
-
-# How long travel waits after each move (milliseconds)
-travel_delay            = -1
-
-# Prefixes manually added notes with the -- string, to make them easier to find
-user_note_prefix        = --
-
-# Controls the speed of animations
-view_delay              = 100
-
-# Adjusts how much autoexplore favours attempting to discover room perimeters and corners.
-# At values higher than 0, autoexplore will more heavily favour visiting squares that are next to walls
-# reasonable values range from 0 to 10 maybe?
-# Try it.
-#explore_wall_bias       = 3
-
-## Implojin
-prompt_menu = false
-# try to prevent autopick from being interrupted during zig cleanup?
-travel_key_stop = false
-#tile_key_repeat_delay = 150
-
-## Prakerore
-confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Greater Servant of Makhleb, Lesser Servant of Makhleb, Fiery Armour, Foxfire Swarm, Rising Flame, Draw Stack, Channel Magic, Divine Exegesis, Finesse, Death's Door, Evoke Invisibility, Unearth Wretches, Torment
-
-## me
-rest_wait_ancestor = true
-tile_show_threat_levels = tough, nasty, unusual
-bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
-fail_severity_to_confirm = 0
-more += Found a staircase to the Ecumenical Temple
-more += You add the spells
-more += forbidden knowledge
-more += Your unholy channel is weakening.
-
-# For gems
-#more_gem_info = true
-#always_show_gems = true
-#explore_auto_rest = false
-#rest_wait_percent = 60
-
-
-######################################################################
-#                           Character Dump                           #
-######################################################################
-
-dump_order     = header, hiscore, stats, misc, inventory, skills, spells
-dump_order    += overview, mutations, messages, screenshot, skill_gains
-dump_order    += notes, turns_by_place, kills_by_place
-dump_order    += action_counts, kills, monlist, vaults
-
-dump_book_spells = false
-ood_interesting = 6
-note_hp_percent = 25
-note_all_skill_levels = true
-note_xom_effects = true
-note_items += of Zot,rod,acquirement
-note_messages += Your scales start
-note_messages += protects you from harm
-note_messages += You fall through a shaft
-note_messages += [bB]anish.*Abyss
-
-# Use the notes in the character dump to spoil information about whether an
-# enemy has been seen before (i.e. have I now killed the same demonologist
-# from which I have fled earlier or was this a different one?).
-note_monsters += Brimstone Fiend
-note_monsters += Ice Fiend
-note_monsters += Tzitzimitl
-note_monsters += caustic shrike
-note_monsters += curse skull
-note_monsters += curse toe
-note_monsters += deep elf demonologist
-note_monsters += deep elf sorcerer
-note_monsters += entropy weaver
-note_monsters += lich
-note_monsters += ancient lich
-note_monsters += pearl dragon
-note_monsters += orb of fire
-
-
-######################################################################
-#                             Spell Slots                            #
-######################################################################
-
-# Set Alias for Spell Slots
-slot := spell_slot
-
-slot += Fireball:f
-slot += Apportation:g
-slot += Sublimation of Blood:m
-slot += Slow:s
-slot += Blink:B
-slot += Sticky Flame:s
-slot += Swiftness:s
-slot += Passwall:w
-slot += Corona:v
-slot += Iskenderun's Mystic Blast:x
-slot += Mephitic Cloud:x
-slot += Vampiric Draining:x
-slot += Iskenderun's Battlesphere:z
-slot += Lee's Rapid Deconstruction:z
-slot += Yara's Violent Unravelling: z
-slot += Animate Dead:A
-slot += Animate Skeleton:A
-slot += Ozocubu's Armour:A
-slot += Death's Door:D
-slot += Borgnjor's Revivification:R
-slot += Fugue of the Fallen:S
-
-######################################################################
-#                            Auto Pickup                             #
-######################################################################
-
-# Gold, scrolls, potions, books, jewellery, wands, gems, staves, misc
-autopickup = $?!:"/â™¦|}
-
-ae := autopickup_exceptions
-ae += <curare-tipped dart
-ae += <(granite|storm) talisman, <talisman of death
-
-
-############################################################################
-#                            Auto Inscriptions                             #
-############################################################################
-
-# Set Alias
-ai := autoinscribe
-
-# Inscribe distortion weapons if you are not worshipping Lugonu
-: if you.god() ~= "Lugonu" then
-    ai += distortion:!w
-  ai += (Sonja|Psyche):!w
-: end
-
-
-# Consumables
-ai += (bad|dangerous)_item.*potion:!q
-ai += potions? of berserk rage:!q
-ai += potions? of mutation:!q
-ai += (bad|dangerous)_item.*scroll:!r
-ai += scrolls? of blinking:!r
-ai += scrolls? of revelation:!r
-
-# Body Armour
-ai += fire dragon (armour|hide):rF++, rC-
-ai += gold dragon (armour|hide):rC+, rF+, rPois
-ai += ice dragon (armour|hide):rC++, rF-
-ai += pearl dragon (armour|hide):rN+
-ai += quicksilver dragon armour:Will+
-ai += shadow dragon (armour|hide):Stlth++++
-ai += steam dragon (armour|hide):rSteam
-ai += storm dragon (armour|hide):rElec
-ai += swamp dragon (armour|hide):rPois
-ai += troll (hide|leather armour):Regen
-
-# Body Armour Egos
-ai += ([^l] leather armour|mail|plate armour|robe|skin) of cold resistance:rC+
-ai += ([^l] leather armour|mail|plate armour|robe|skin) of fire resistance:rF+
-ai += (leather armour|mail|plate armour|robe) of willpower:Will+
-ai += (leather armour|mail|plate armour|robe) of positive energy:rN+
-ai += (leather armour|mail|plate armour) of poison resistance:rPois
-ai += plate armour of ponderousness:Speed-
-ai += robe of resistance:rC+, rF+
-ai += troll leather armour of cold resistance:rC+
-ai += troll leather armour of fire resistance:rF+
-
-# Accessory Egos
-ai += (barding|boots) of flight:+Fly
-ai += (buckler|shield) of protection:AC+3
-ai += (buckler|shield) of resistance:rC+, rF+
-ai += hat of spirit shield:Spirit
-
-# Amulets
-ai += amulet of faith:Faith, !P
-
-# Rings
-ai += ring of fire:rF+, rC-
-ai += ring of ice:rC+, rF-
-ai += ring of magical power:MP+9
-ai += ring of poison resistance:rPois
-ai += ring of positive energy:rN+
-ai += ring of protection from cold:rC+
-ai += ring of protection from fire:rF+
-ai += ring of willpower:Will+
-#ai += ring of see invisible:sI
-ai += ring of stealth:Stlth+
-ai += ring of wizardry:Wiz+
-
-# Staves
-ai += staff of air:rElec
-ai += staff of cold:rC+
-ai += staff of death:rN+
-ai += staff of fire:rF+
-ai += staff of alchemy:rPois
-ai += staff of wizardry:Wiz+
-
-show_god_gift = unident
-
-############################################################################
-#                                  Macros                                  #
-############################################################################
 
 ## Shout walk binding
 macros += M \{25} ===shout_walk_y 
@@ -1870,13 +1676,24 @@ macros += M o ===SafeExplore
 macros += K1 o <
 macros += K1 O .
 
+## downstairs peeking (broken)
+#macros += M > ===PeekDownstairs
+#macros += K1 > ===LevelMapDownstairs
+#macros += K1 \{Esc} ===LevelMapExit
+
 ## downstairs prompt
 macros += M > ===SafeDownstairs
 
-## exclude dangerous upstairs
-macros += M < ===SafeUpstairs
-
 ## autopickup
 macros += M d ===DropItem
-macros += M D ===DebugAutopickup
 :add_autopickup_func(autopickup)
+
+# from Prakerore rc
+confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Greater Servant of Makhleb, Lesser Servant of Makhleb, Fiery Armour, Foxfire Swarm, Rising Flame, Draw Stack, Channel Magic, Divine Exegesis, Finesse, Death's Door, Evoke Invisibility, Unearth Wretches, Torment
+
+# For gems
+#more_gem_info = true
+#always_show_gems = true
+#explore_auto_rest = false
+#rest_wait_percent = 60
+
