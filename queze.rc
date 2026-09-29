@@ -293,12 +293,13 @@ end
 #                               Macros                               #
 ######################################################################
 
-# Shout walk
+# Hold Ctrl to shout walk
+# May require remapping Ctrl-N in browser (e.g. Ctrl-Alt-N)
 macros += M \{25} ===shout_walk_y 
 macros += M \{21} ===shout_walk_u 
 macros += M \{8} ===shout_walk_h 
 macros += M \{2} ===shout_walk_b 
-macros += M \{14} ===shout_walk_n 
+macros += M \{14} ===shout_walk_n
 macros += M \{10} ===shout_walk_j 
 macros += M \{11} ===shout_walk_k 
 macros += M \{12} ===shout_walk_l 
