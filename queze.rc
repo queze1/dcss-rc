@@ -8,12 +8,15 @@ default_manual_training = true
 # Use old inventory layout
 show_paged_inventory = false
 
-## Travel and autopickup
+## Travel
 travel_delay = -1
 explore_delay = -1
 rest_delay = -1
 explore_stop += greedy_items
 travel_open_doors = true
+
+## Autopickup
+autopickup = $?!+"/♦%
 drop_disables_autopickup = true
 
 autofight_stop = 70
