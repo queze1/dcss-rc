@@ -8,19 +8,25 @@ default_manual_training = true
 # Use old inventory layout
 show_paged_inventory = false
 
-## Travel
+# Travel & resting
 travel_delay = -1
 explore_delay = -1
 rest_delay = -1
+rest_wait_both = true
 explore_stop += greedy_items
+travel_key_stop = false
 travel_open_doors = true
+show_travel_trail = true
 
-## Autopickup
+# Autopickup
 autopickup = $?!+"/♦%
 drop_disables_autopickup = true
 
 autofight_stop = 70
 bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
+
+# Controls the speed of animations (default: 600)
+view_delay = 100
 
 hp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
 mp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
@@ -45,12 +51,33 @@ force_spell_targeter += Permafrost Eruption
 force_spell_targeter += Malign Gateway
 
 ######################################################################
+#                             Spell Slots                            #
+######################################################################
+
+# Set Alias for Spell Slots
+slot := spell_slot
+
+slot += Fireball:f
+slot += Apportation:g
+slot += Slow:s
+slot += Swiftness:s
+slot += Passwall:w
+slot += Mephitic Cloud:x
+slot += Vampiric Draining:x
+slot += Iskenderun's Battlesphere:z
+slot += Lee's Rapid Deconstruction:z
+slot += Animate Dead:A
+slot += Ozocubu's Armour:A
+slot += Death's Door:D
+slot += Borgnjor's Revivification:R
+
+######################################################################
 #                           Character Dump                           #
 ######################################################################
 note_chat_messages = true
 note_hp_percent = 25
 note_all_skill_levels = true
-user_note_prefix = >>
+user_note_prefix = --
 note_items += experience,of resistance, Archmagi
 note_items += crystal plate armour,pearl dragon scales
 note_items += artefact
