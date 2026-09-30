@@ -40,6 +40,7 @@ confirm_action += Rending Blade
 
 unusual_monster_items += vulnerable:venom:7
 force_spell_targeter = Animate Dead
+force_spell_targeter = Iskenderun's Mystic Blast
 force_spell_targeter = Permafrost Eruption
 force_spell_targeter = Malign Gateway
 
