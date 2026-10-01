@@ -244,7 +244,7 @@ function ShoutWalkCreator(direction)
       ask_for_confirmation = false
     end
 
-    -- Shout, then set walking direction for next turn
+    -- Shout, then set direction for next turn
     crawl.sendkeys("tt")
     last_action = "shout"
     next_direction = direction
@@ -254,21 +254,22 @@ end
 
 -- Manages the state tracking
 function ShoutWalkManager()
-  -- Reset the noise warning and direction at the start of every turn
   local direction = next_direction
+  local action = last_action
   noise_warning = false
   next_direction = nil
-  
-  if not direction then
-    last_action = nil
-    return
-  end
+  last_action = nil
 
-  -- Ask for confirmation on non-subsequent shout walks
-  if last_action == nil then
+  -- Ask for confirmation again between shout walks
+  if action == nil then
     ask_for_confirmation = true
   end
 
+  -- Skip if no direction was set, or if we didn't shout last turn
+  if direction == nil or action ~= "shout" then
+    return
+  end
+  
   -- Abort if an enemy is in LOS
   if IsEnemyInLOS() then
     crawl.mpr("A monster has walked into LOS. Walk canceled.", 3)
