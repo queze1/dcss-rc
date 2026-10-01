@@ -215,6 +215,7 @@ function FelidZF()
 end
 
 -- Shout before walking and stop if any monsters shout back
+local ask_for_confirmation = true
 local noise_warning = false
 local next_direction
 
@@ -234,6 +235,14 @@ function ShoutWalkCreator(direction)
       end
     end
 
+    -- Shout walking is dangerous, ask to confirm
+    if ask_for_confirmation then
+      if not crawl.yesno("Really shout walk? This may wake up nearby monsters!") then
+        return
+      end
+      ask_for_confirmation = false
+    end
+
     -- Shout, then set walking direction for next turn
     crawl.sendkeys("tt")
     next_direction = direction
@@ -249,6 +258,8 @@ function ShoutWalkManager()
   next_direction = nil
   
   if not direction then
+    -- Ask for confirmation on the next shout walk
+    ask_for_confirmation = true
     return
   end
 
