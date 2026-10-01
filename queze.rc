@@ -237,7 +237,7 @@ function ShoutWalkCreator(direction)
 
     -- Shout walking is dangerous, ask to confirm
     if ask_for_confirmation then
-      if not crawl.yesno("Really shout walk? This may wake up nearby monsters!") then
+      if not crawl.yesno("Really shout walk? This will wake up nearby monsters!") then
         return
       end
       ask_for_confirmation = false
