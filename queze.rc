@@ -96,7 +96,6 @@ note_messages += cast .* Abyss
 
 -- Helper function generating all coords in LOS
 function LOSCoords()
-  local x, y
   local coords = {}
   for x = -you.los(), you.los() do
     for y = -you.los(), you.los() do
@@ -184,7 +183,7 @@ function SafeExplore()
   -- Do not allow exploring if you have a sentinel's mark
   -- Not sure if you.status() works now
   if FindMessage("mark forms upon you", "mark upon you fades away") then
-    crawl.mpr("<lightred>A sentinel's mark is upon you!<lightred>")
+    crawl.mpr("<lightred>A sentinel's mark is upon you!</lightred>")
 	
   elseif IsSafe() or retreated then
     crawl.do_commands({"CMD_EXPLORE"})
@@ -299,9 +298,10 @@ end
 
 -- Excludes all upstairs in LOS if an enemy is in LOS
 function AutoExcludeUpstairs()
+  local enemy = IsEnemyInLOS()
   for _, c in ipairs(LOSCoords()) do
     if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
-      if IsEnemyInLOS() then
+      if enemy then
         travel.set_exclude(c.x, c.y, 2)
       else
         travel.del_exclude(c.x, c.y)
