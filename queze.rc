@@ -217,6 +217,7 @@ end
 -- Shout before walking and stop if any monsters shout back
 local ask_for_confirmation = true
 local noise_warning = false
+local last_action
 local next_direction
 
 -- Create a shout walk function for a direction
@@ -245,6 +246,7 @@ function ShoutWalkCreator(direction)
 
     -- Shout, then set walking direction for next turn
     crawl.sendkeys("tt")
+    last_action = "shout"
     next_direction = direction
   end
 end
@@ -258,9 +260,13 @@ function ShoutWalkManager()
   next_direction = nil
   
   if not direction then
-    -- Ask for confirmation on the next shout walk
-    ask_for_confirmation = true
+    last_action = nil
     return
+  end
+
+  -- Ask for confirmation on non-subsequent shout walks
+  if last_action == nil then
+    ask_for_confirmation = true
   end
 
   -- Abort if an enemy is in LOS
@@ -277,7 +283,9 @@ function ShoutWalkManager()
     return
   end
   
+  -- Walk in the direction set last turn
   crawl.sendkeys(direction)
+  last_action = "walk"
 end
 
 function ShoutWalkMapper()
