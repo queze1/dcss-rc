@@ -22,11 +22,10 @@ show_travel_trail = true
 autopickup = $?!+"/♦%
 drop_disables_autopickup = true
 
-autofight_stop = 70
-bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
-
 # Controls the speed of animations (default: 600)
 view_delay = 100
+
+autofight_stop = 70
 
 hp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
 mp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
@@ -321,8 +320,10 @@ end
 
 
 ######################################################################
-#                               Macros                               #
+#                              Keybinds                              #
 ######################################################################
+
+bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
 
 # Hold Ctrl to shout walk
 # May require remapping Ctrl-N in browser (e.g. Ctrl-Alt-N)
