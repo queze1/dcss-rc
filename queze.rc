@@ -109,7 +109,7 @@ end
 -- Helper function returning true if a hostile creature is in LOS
 function IsEnemyInLOS()
   for _, c in ipairs(LOSCoords()) do
-    m = monster.get_monster_at(c.x, c.y)
+    local m = monster.get_monster_at(c.x, c.y)
     -- 0 = hostile, 1 = neutral, 2 = strict neutral, 3 = good neutral, 4 = friendly
     if m and m:attitude() < 1 and not m:is_safe() then
       return true
@@ -125,7 +125,7 @@ function FindMessage(match, stop)
   -- Check at most 100 messages
   while (counter < 100)
   do
-    message = crawl.messages(counter)
+    local message = crawl.messages(counter)
     counter = counter + 1
 
     if string.find(message, match) then
@@ -139,8 +139,8 @@ end
 
 -- Helper function returning true if you are completely rested
 function IsHealthy()
-  hp, mhp = you.hp()
-  mp, mmp = you.mp()
+  local hp, mhp = you.hp()
+  local mp, mmp = you.mp()
   if hp < mhp then
     return false
   elseif mp < mmp then
@@ -245,7 +245,7 @@ end
 -- Manages the state tracking
 function ShoutWalkManager()
   -- Reset the noise warning and direction at the start of every turn
-  direction = next_direction
+  local direction = next_direction
   noise_warning = false
   next_direction = nil
   
