@@ -31,6 +31,9 @@ hp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
 mp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
 tile_show_threat_levels = tough, nasty, unusual
 
+# Increase font size when playing offline
+tile_font_msg_size = 16
+
 show_more = false
 force_more_message += into view
 force_more_message += Your unholy channel is weakening.
