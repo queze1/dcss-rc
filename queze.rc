@@ -441,6 +441,17 @@ end
 -- Set up shout walk functions
 ShoutWalkMapper()
 
+
+-- Setup for excluding downstairs with enemies in LOS
+local mark_return_stair
+
+function SafeUpstairs()
+  local feature = view.feature_at(0, 0)
+  mark_return_stair = IsUpstair(feature) and IsEnemyInLOS()
+  crawl.do_commands({"CMD_GO_UPSTAIRS"})
+end
+
+
 -- =========================
 -- CUSTOM HOOKS
 -- =========================
@@ -469,10 +480,25 @@ function AutoExcludeUpstairs()
   end
 end
 
+
+-- Exclude a downstair, if enemies were in LOS when going upstairs
+function MarkReturnStair()
+  if not mark_return_stair then
+    return
+  end
+
+  if IsDownstair(view.feature_at(0, 0)) then
+    travel.set_exclude(0, 0, 0)
+  end
+
+  mark_return_stair = false
+end
+ 
 function ready()
   AnnounceDamage()
   OpenSkills()
 
+  MarkReturnStair()
   ShoutWalkManager()
 end
 }
@@ -507,6 +533,7 @@ macros += M 9 zh
 macros += M w ===FelidZF
 macros += M e ze
 
-# Safe explore
+# Guards
 macros += M o ===SafeExplore
+macros += M < ===SafeUpstairs
 
