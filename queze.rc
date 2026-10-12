@@ -506,6 +506,7 @@ function SafeDownstairs()
   if branch == "Vaults" and depth == 4 and deepest_current < 5 then
     if crawl.yesno("Are you really prepared to enter Vaults:5?") then
       crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+      return
     end
   end
 
