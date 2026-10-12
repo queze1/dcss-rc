@@ -461,7 +461,7 @@ end
 ShoutWalkMapper()
 
 
--- Setup for excluding downstairs with enemies in LOS
+-- Setup for excluding return stairs, if enemies were in LOS
 local mark_return_stair
 
 function SafeUpstairs()
@@ -472,7 +472,7 @@ end
 
 -- Prompt when going downstairs when not healthy
 function SafeDownstairs()
-  if not IsDownStair(view.feature_at(0, 0)) then
+  if not IsDownstair(view.feature_at(0, 0)) then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
   elseif IsHealthy() then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
@@ -518,6 +518,7 @@ function MarkReturnStair()
   end
 
   if IsDownstair(view.feature_at(0, 0)) then
+    crawl.mpr("<lightred>Return stair excluded. Enemies were in view.</lightred>")
     travel.set_exclude(0, 0, 0)
   end
 
