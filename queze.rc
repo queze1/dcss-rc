@@ -276,15 +276,13 @@ function FindMessage(match, stop)
   end
 end
 
--- Helper function returning true if you are completely rested
+-- Helper function returning true if you are at full HP/MP
 function IsHealthy()
   local hp, mhp = you.hp()
   local mp, mmp = you.mp()
   if hp < mhp then
     return false
   elseif mp < mmp then
-    return false
-  elseif you.contamination() > 0 then
     return false
   end
   return true
@@ -457,6 +455,7 @@ function OpenSkills()
 end
 
 -- Excludes all upstairs in LOS if an enemy is in LOS
+-- NOTE: Was intended to prevent accidently going downstairs when where are enemies at the entrance. Too annoying though.
 function AutoExcludeUpstairs()
   local enemy = IsEnemyInLOS()
   for _, c in ipairs(LOSCoords()) do
@@ -474,7 +473,6 @@ function ready()
   AnnounceDamage()
   OpenSkills()
 
-  AutoExcludeUpstairs()
   ShoutWalkManager()
 end
 }
