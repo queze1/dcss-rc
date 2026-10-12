@@ -276,7 +276,7 @@ function FindMessage(match, stop)
   end
 end
 
--- Helper function returning true if you are at full HP/MP
+-- Helper function returning true if you are completely rested
 function IsHealthy()
   local hp, mhp = you.hp()
   local mp, mmp = you.mp()
@@ -284,11 +284,13 @@ function IsHealthy()
     return false
   elseif mp < mmp then
     return false
+  elseif you.contamination() > 0 then
+    return false
   end
   return true
 end
 
--- Helper function returning true if a feature is an upstairs
+-- Helper function returning true if a feature is an upstair
 function IsUpstair(feature)
   if feature == nil then
     return false
@@ -302,13 +304,30 @@ function IsUpstair(feature)
   return false
 end
 
--- Helper function returning true if it's safe to rest
-function IsSafe()
-  local standing_on = view.feature_at(0, 0)
-  if IsUpstair(standing_on) then
+-- Helper function returning true if a feature is an downstair 
+function IsDownstair(feature)
+  if feature == nil then
+    return false
+  elseif string.find(feature, "stairs_down") then
+    return true
+  elseif string.find(feature, "escape_hatch_down") then
+    return true
+  elseif string.find(feature, "enter_") then
     return true
   end
-  return IsHealthy()
+  return false
+end
+
+-- Helper function returning true if it's safe to autoexplore
+function IsSafe()
+  local feature = view.feature_at(0, 0)
+  if IsUpstair(feature) then
+    return true
+  end
+
+  local hp, mhp = you.hp()
+  local mp, mmp = you.mp()
+  return hp == mhp and mp == mmp
 end
 
 -- =========================
@@ -451,6 +470,17 @@ function SafeUpstairs()
   crawl.do_commands({"CMD_GO_UPSTAIRS"})
 end
 
+-- Prompt when going downstairs when not healthy
+function SafeDownstairs()
+  if not IsDownStair(view.feature_at(0, 0)) then
+    crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+  elseif IsHealthy() then
+    crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+  elseif crawl.yesno("Really go downstairs while injured?") then
+    crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+  end
+end
+
 
 -- =========================
 -- CUSTOM HOOKS
@@ -536,4 +566,5 @@ macros += M e ze
 # Guards
 macros += M o ===SafeExplore
 macros += M < ===SafeUpstairs
+macros += M > ===SafeDownstairs
 
