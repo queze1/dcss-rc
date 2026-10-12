@@ -470,11 +470,47 @@ function SafeUpstairs()
   crawl.do_commands({"CMD_GO_UPSTAIRS"})
 end
 
--- Prompt when going downstairs when not healthy
+
+-- Prompt when going downstairs in dangerous situations
 function SafeDownstairs()
   if not IsDownstair(view.feature_at(0, 0)) then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
-  elseif IsHealthy() then
+    return
+  end
+
+  local branch = you.branch()
+  local depth = you.depth()
+  local deepest_current = travel.find_deepest_explored(branch) or 0
+  local deepest_depths = travel.find_deepest_explored("Depths") or 0
+
+  -- Prevent going to Vaults:5 before Depths:4
+  if branch == "Vaults" and depth == 4 and deepest_depths < 4 then
+    crawl.mpr("<lightred>Clear Depths before doing Vaults:5, dummy.</lightred>")
+    return
+  end
+
+  local s_branches = {"Shoals", "Swamp", "Snake"}
+  local in_s_branch = table.find(s_branches, branch) ~= nil
+
+  -- Warn before entering the fourth floor of an S-branch before checking another
+  if in_s_branch and depth == 3 and deepest_current < 4 then
+    local explored_another_s_branch = false
+    for _, s_branch in ipairs(s_branches) do
+      if s_branch ~= branch and (travel.find_deepest_explored(s_branch) or 0) > 0 then
+        explored_another_s_branch = true
+        break
+      end
+    end
+
+    if not explored_another_s_branch then
+      if crawl.yesno("Really go downstairs to the last level before exploring another S-branch?") then
+        crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+      end
+      return
+    end
+  end
+
+  if IsHealthy() then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
   elseif crawl.yesno("Really go downstairs while injured?") then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
@@ -552,4 +588,3 @@ macros += M e ze
 macros += M o ===SafeExplore
 macros += M < ===SafeUpstairs
 macros += M > ===SafeDownstairs
-
