@@ -497,7 +497,7 @@ function SafeDownstairs()
   local deepest_depths = travel.find_deepest_explored("Depths") or 0
 
   -- Prevent going to Vaults:5 before Depths
-  if branch == "Vaults" and depth == 4 and deepest_depths > 0 then
+  if branch == "Vaults" and depth == 4 and deepest_depths == 0 then
     crawl.mpr("<lightred>Visit Depths before doing Vaults:5, please.</lightred>")
     return
   end
