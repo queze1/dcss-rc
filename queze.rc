@@ -495,22 +495,6 @@ function OpenSkills()
   end
 end
 
--- Excludes all upstairs in LOS if an enemy is in LOS
--- NOTE: Was intended to prevent accidently going downstairs when where are enemies at the entrance. Too annoying though.
-function AutoExcludeUpstairs()
-  local enemy = IsEnemyInLOS()
-  for _, c in ipairs(LOSCoords()) do
-    if IsUpstair(view.feature_at(c.x, c.y)) and view.cell_see_cell (0, 0, c.x, c.y) then
-      if enemy then
-        travel.set_exclude(c.x, c.y, 2)
-      else
-        travel.del_exclude(c.x, c.y)
-      end
-    end
-  end
-end
-
-
 -- Exclude a downstair, if enemies were in LOS when going upstairs
 function MarkReturnStair()
   if not mark_return_stair then
