@@ -497,15 +497,22 @@ function SafeDownstairs()
   local deepest_depths = travel.find_deepest_explored("Depths") or 0
 
   -- Prevent going to Vaults:5 before Depths
-  if branch == "Vaults" and depth == 4 and deepest_depths > 0 and deepest_current < 5 then
+  if branch == "Vaults" and depth == 4 and deepest_depths > 0 then
     crawl.mpr("<lightred>Visit Depths before doing Vaults:5, please.</lightred>")
     return
+  end
+
+  -- Warn before going to V:5 for the first time
+  if branch == "Vaults" and depth == 4 and deepest_current < 5 then
+    if crawl.yesno("Are you really prepared to enter Vaults:5?") then
+      crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
+    end
   end
 
   local s_branches = {"Shoals", "Swamp", "Snake", "Spider"}
   local in_s_branch = contains(s_branches, branch)
 
-  -- Warn before entering the fourth floor of an S-branch before checking another
+  -- Warn before entering the fourth floor of an S-branch for the first time before exploring another
   if in_s_branch and depth == 3 and deepest_current < 4 then
     local explored_another_s_branch = false
     for _, s_branch in ipairs(s_branches) do
