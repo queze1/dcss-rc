@@ -620,6 +620,7 @@ function MarkReturnStair()
   end
 
   if IsDownstair(view.feature_at(0, 0)) then
+    crawl.mpr("<lightred>Staircase saved. Enemies were in view.</lightred>")
     travel.set_waypoint(9, 0, 0)
   end
 
