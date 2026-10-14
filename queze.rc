@@ -528,7 +528,7 @@ end
 ShoutWalkMapper()
 
 
--- Setup for excluding return stairs, if enemies were in LOS
+-- Setup for remembering return stairs, if enemies were in LOS
 local mark_return_stair
 
 function SafeUpstairs()
@@ -543,6 +543,13 @@ function SafeDownstairs()
   if not IsDownstair(view.feature_at(0, 0)) then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
     return
+  end
+
+  local return_stair_x, return_stair_y = travel.waypoint_delta(9)
+  if return_stair_x == 0 and return_stair_y == 0 then
+    if not crawl.yesno("Really use the return stair? Enemies were in view.") then
+      return
+    end
   end
 
   local branch = you.branch()
@@ -606,15 +613,14 @@ function OpenSkills()
   end
 end
 
--- Exclude a downstair, if enemies were in LOS when going upstairs
+-- Save a downstair in waypoint 9, if enemies were in LOS when going upstairs
 function MarkReturnStair()
   if not mark_return_stair then
     return
   end
 
   if IsDownstair(view.feature_at(0, 0)) then
-    crawl.mpr("<lightred>Return stair excluded. Enemies were in view.</lightred>")
-    travel.set_exclude(0, 0, 0)
+    travel.set_waypoint(9, 0, 0)
   end
 
   mark_return_stair = false
