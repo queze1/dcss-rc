@@ -611,6 +611,28 @@ function MarkReturnStair()
 
   mark_return_stair = false
 end
+
+-- Autoscribe branded items
+function AutoInscribe()
+  for _, item_list in ipairs({items.inventory(), you.floor_items() or {}}) do
+    for _, item in ipairs(item_list) do
+      if not item.artefact then
+        local ego = item.ego(true)
+
+        if ego then
+          -- Only inscribe if the ego contains "+" or is a resist (e.g. rF+, MP+, rElec)
+          local should_inscribe_ego = ego:find("+", 1, true) or ego:find("%f[%a]r%u")
+
+          if should_inscribe_ego and item.inscription ~= ego then
+            item.inscribe(ego, false)
+          elseif not should_inscribe_ego and item.inscription ~= "" then
+            item.inscribe("", false)
+          end
+        end
+      end
+    end
+  end
+end
  
 function ready()
   AnnounceDamage()
@@ -618,6 +640,7 @@ function ready()
 
   MarkReturnStair()
   ShoutWalkManager()
+  AutoInscribe()
 end
 }
 
