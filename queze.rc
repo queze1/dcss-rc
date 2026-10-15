@@ -356,8 +356,9 @@ function id_warn()
 end
 }
 
-# Threat warning from Implojin as of 15/10/2026
+# Threat warning from Implojin as of 15/10/2026 (last updated 18/1/2024)
 # https://github.com/Implojin/implo-rc/blob/main/init.lua
+# Some differences due to fixes by me
 
 # flash screen for our scripted danger tier warnings above tier 2
 flash_screen_message += T2
@@ -394,13 +395,11 @@ function check(mons, ability_string, damage)
     books = mons:spells()
     if books ~= nil then
         for _,book in ipairs(books) do
-            for _,spell in ipairs(book) do
-                if spell == ability_string then
-                    if damage ~= nil then
-                        return check_abil_dam(mons, ability_string) > damage
-                    else
-                        return true
-                    end
+            if util.contains(book, ability_string) then
+                if damage ~= nil then
+                    return check_abil_dam(mons, ability_string) > damage
+                else
+                    return true
                 end
             end
         end
@@ -511,14 +510,6 @@ function check_abil_pct(mons, ability)
     return pct
 end
 
-local function all_true(table)
-    for _,v in ipairs(table) do
-        if v == nil then return false end
-        if not (v == true) then return false end
-    end
-    return true
-end
-
 local function same_coords(c1x, c1y, c2x, c2y)
     if c1x == c2x and c1y == c2y then return true end
     return false
@@ -580,42 +571,6 @@ function check_rare_ood(m)
     -- we use a fixed OOD threshold so it doesn't grow later
     local ood_threshold = 3
     return mdepth > you_depth + ood_threshold and mprob < 2
-end
-
--- The conditions here check for torment immunity, not torment resistance.
--- This function is named and patterned after player::res_torment(), such that I could theoretically
--- straight up delete this and replace its check with you.res_torment(), if that's ever added.
-function you_res_torment()
-    -- (you.get_mutation_level(MUT_TORMENT_RESISTANCE) >= 2)
-    if you.get_base_mutation_level("torment resistance") >= 2 then
-        return true
-    end
-    -- get_form()->res_neg() == 3
-    -- this appears to be MR_RES_NEG, 3 in form-data.h
-    -- notably, this excludes statue form, as that only provides MR_RES_NEG 1
-    local transform = you.transform()
-    if transform == "death" or transform == "wisp" or transform == "fungus" or transform == "shadow" then
-        return true
-    end
-    -- || you.has_mutation(MUT_VAMPIRISM) && !you.vampire_alive
-    if you.get_base_mutation_level("vampiric") > 0 and you.status("bloodless") == true then
-        return true
-    end
-    -- || you.petrified()
-    -- player::petrified() returns duration[DUR_PETRIFIED]
-    -- this check would appear to be pointless for our purposes, as our script won't be getting turns while petrified,
-    -- but we include it here anyway, for completeness
-    if you.status("petrified") then
-        return true
-    end
-    -- || you.form == transformation::tree
-    if transform == "tree" then
-        return true
-    end
-    -- we do not recreate logic for player_equip_unrand(UNRAND_ETERNAL_TORMENT) here, as it has not generated since 2015
-
-    -- TODO: add partial torment resistance checks, maybe?
-    return false
 end
 
 -- This function is patterned after player::undead_state(), for purpose of checking Dispel Undead vulnerability.
@@ -904,7 +859,7 @@ local status = {
                        check_abil_pct(mons, "Doom Howl") ~= nil and check_abil_pct(mons, "Doom Howl") > 5},
                tier = 3,
              reason = "Doom Howl " .. (check_abil_pct(mons, "Doom Howl") or "buggy") .. "%, equip more Will or hex it or something"} ,
-        {conditions = {check(mons, "Symbol of Torment"), you_res_torment() ~= true},
+        {conditions = {check(mons, "Symbol of Torment"), not you.torment_immune()},
                tier = 3,
              reason = "Torment and not torment immune!"} ,
 
@@ -948,7 +903,7 @@ local status = {
 -- end danger table
 
         for _,threat in ipairs(danger_table) do
-            if all_true(threat.conditions) then
+            if util.forall(threat.conditions, function(value) return value == true end) then
                 local needs_warn = true
                 -- if this entry to current_threats matches a known_threats entry, don't warn about it,
                 -- but also delete the matching known_threats entry, so that we can properly warn about duplicate threats.
