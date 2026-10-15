@@ -77,6 +77,7 @@ slot += Borgnjor's Revivification:R
 ######################################################################
 #                           Character Dump                           #
 ######################################################################
+
 note_chat_messages = true
 note_hp_percent = 25
 note_all_skill_levels = true
