@@ -612,21 +612,50 @@ function MarkReturnStair()
   mark_return_stair = false
 end
 
--- Autoscribe branded items
+local inscription_properties = {
+  Will = true, rC = true, rF = true, rN = true,
+  Regen = true, Stlth = true,
+  Str = true, Int = true, Dex = true, Slay = true,
+  EV = true, AC = true, MP = true,
+  rCorr = true, rElec = true, rMut = true, rPois = true,
+  rSteam = true, rTorment = true, rDrown = true,
+  Ice = true, Fire = true,
+  sInv = true, flight = true,
+};
+
+-- Relies on stash annotation
+-- See https://github.com/crawl/crawl/blob/master/crawl-ref/source/dat/clua/stash.lua
+local function FindItemProperties(description)
+  local prefixes = description:match("Stash search prefixes:%s*(.-)\nMenu/colouring prefixes:")
+    or description:match("Stash search prefixes:%s*(.*)")
+  if not prefixes then
+    return nil
+  end
+
+  -- Find an item's properties by searching their description
+  local properties, seen = {}, {}
+  for group in prefixes:gmatch("{([^{}]*)}") do
+    for token in group:gmatch("%S+") do
+      local base = token:match("^([%a]+)[+-]*%d*$")
+      if inscription_properties[base] and not seen[token] then
+        properties[#properties + 1] = token
+        seen[token] = true
+      end
+    end
+  end
+  return properties
+end
+
+-- Autoinscribe items with their properties
 function AutoInscribe()
   for _, item_list in ipairs({items.inventory(), you.floor_items() or {}}) do
     for _, item in ipairs(item_list) do
       if not item.artefact then
-        local ego = item.ego(true)
-
-        if ego then
-          -- Only inscribe if the ego contains "+" or is a resist (e.g. rF+, MP+, rElec)
-          local should_inscribe_ego = ego:find("+", 1, true) or ego:find("%f[%a]r%u")
-
-          if should_inscribe_ego and item.inscription ~= ego then
-            item.inscribe(ego, false)
-          elseif not should_inscribe_ego and item.inscription ~= "" then
-            item.inscribe("", false)
+        local properties = FindItemProperties(item.description or "")
+        if properties then
+          local inscription = table.concat(properties, " ")
+          if item.inscription ~= inscription then
+            item.inscribe(inscription, false)
           end
         end
       end
