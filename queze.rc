@@ -459,7 +459,7 @@ function IsSafe()
 end
 
 -- =========================
--- MACROS
+-- EXPLORATION
 -- =========================
 
 local retreated = false
@@ -490,14 +490,9 @@ function SafeExplore()
   end
 end
 
--- Repurpose (w)ield for spellcasting, but only for felids
-function FelidZF()
-  if you.race() == "Felid" then
-    crawl.sendkeys("zf")
-  else
-    crawl.do_commands({"CMD_WIELD_WEAPON"})
-  end
-end
+-- =========================
+-- SHOUT WALKING
+-- =========================
 
 -- Shout before walking and stop if any monsters shout back
 local ask_for_confirmation = true
@@ -535,7 +530,6 @@ function ShoutWalkCreator(direction)
     next_direction = direction
   end
 end
-
 
 -- Manages the state tracking
 function ShoutWalkManager()
@@ -588,8 +582,10 @@ end
 -- Set up shout walk functions
 ShoutWalkMapper()
 
+-- =========================
+-- STAIR SAFETY
+-- =========================
 
--- Setup for remembering return stairs, if enemies were in LOS
 local mark_return_stair
 
 function SafeUpstairs()
@@ -600,6 +596,19 @@ function SafeUpstairs()
   crawl.do_commands({"CMD_GO_UPSTAIRS"})
 end
 
+-- Save a downstair in waypoint 9, if enemies were in LOS when going upstairs
+function MarkReturnStair()
+  if not mark_return_stair then
+    return
+  end
+
+  if IsDownstair(view.feature_at(0, 0)) then
+    crawl.mpr("<lightred>Staircase saved. Enemies were in view.</lightred>")
+    travel.set_waypoint(9, 0, 0)
+  end
+
+  mark_return_stair = false
+end
 
 -- Prompt when going downstairs in dangerous situations
 function SafeDownstairs()
@@ -661,33 +670,9 @@ function SafeDownstairs()
   end
 end
 
-
 -- =========================
--- CUSTOM HOOKS
+-- AUTOINSCRIPTION
 -- =========================
-
--- Opens skill menu at the beginning of the game
-local need_skills_opened = true
-function OpenSkills()
-  if you.turns() == 0 and need_skills_opened then
-    need_skills_opened = false
-    crawl.sendkeys("m")
-  end
-end
-
--- Save a downstair in waypoint 9, if enemies were in LOS when going upstairs
-function MarkReturnStair()
-  if not mark_return_stair then
-    return
-  end
-
-  if IsDownstair(view.feature_at(0, 0)) then
-    crawl.mpr("<lightred>Staircase saved. Enemies were in view.</lightred>")
-    travel.set_waypoint(9, 0, 0)
-  end
-
-  mark_return_stair = false
-end
 
 local inscription_properties = {
   Will = true, rC = true, rF = true, rN = true,
@@ -816,6 +801,32 @@ function AutoInscribe()
     end
   end
 end
+
+-- =========================
+-- SPELLCASTING
+-- =========================
+
+-- Repurpose (w)ield for spellcasting, but only for felids
+function FelidZE()
+  if you.race() == "Felid" then
+    crawl.sendkeys("ze")
+  else
+    crawl.do_commands({"CMD_WIELD_WEAPON"})
+  end
+end
+
+-- =========================
+-- HOOKS
+-- =========================
+
+-- Opens skill menu at the beginning of the game
+local need_skills_opened = true
+function OpenSkills()
+  if you.turns() == 0 and need_skills_opened then
+    need_skills_opened = false
+    crawl.sendkeys("m")
+  end
+end
  
 function ready()
   AnnounceDamage()
@@ -854,8 +865,7 @@ macros += M 6 ze
 macros += M 7 zf
 macros += M 8 zg
 macros += M 9 zh
-macros += M w ===FelidZF
-macros += M e ze
+macros += M w ===FelidZE
 
 # Guards
 macros += M o ===SafeExplore
