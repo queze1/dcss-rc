@@ -883,7 +883,15 @@ local status = {
              reason = "Damnation in LOS, careful!"} ,
         {conditions = {check(mons, "Call Down Damnation")},
                tier = 2,
-             reason = "Damnation (smite) in LOS, watch out!"} , }
+             reason = "Damnation (smite) in LOS, watch out!"} ,
+
+        -- by me
+        {conditions = {check(mons, "Smiting"), you.hp() < 50},
+               tier = 2,
+             reason = "Smiter in LOS and HP below 50, watch out!"} ,
+        {conditions = {check(mons, "Blink Allies Encircling")},
+               tier = 2,
+             reason = "Encircling blink in LOS, watch out!"} , }
 
         -- TODO: handle radroach irradiate
         -- TODO: handle ophan "Holy Flames" vs. unholy/undead player check
