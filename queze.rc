@@ -962,6 +962,26 @@ local status = {
         end
     end, }
 
+local message_log_threat_table = {
+    {conditions = "into a shaft and drop",
+           tier = 3,
+         reason = "Shafted!"} ,
+    {conditions = "You are yanked towards",
+           tier = 3,
+         reason = "Malevolent teleportation!"} , }
+
+-- ch_stop_running preempts(?) c_message, so here we track state, and defer acting on it until the next ready().
+-- TODO: check messages for whether the player was shafted / teleported, and if so, stop reissuing autoexplore?
+-- I don't want the script blindly re-issuing actions if the floor situation has changed.
+function c_message(text, channel)
+    for _,threat in ipairs(message_log_threat_table) do
+        if string.find(text, threat.conditions) then
+            table.insert(pending_message_warnings, {name = threat.reason, tier = threat.tier, reason = threat.reason, last_warned = nil})
+            status:_issue_message_log_warnings() 
+       end
+    end
+end
+
 function WarnThreats()
     status:update()
 end
