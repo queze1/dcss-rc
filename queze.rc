@@ -649,13 +649,13 @@ end
 local talisman_property_order = {
   "rF", "rC", "rPois", "rN", "rElec", "rCorr", "Will",
   "Str", "Int", "Dex", "Stlth",
-}
+};
 local talisman_property_aliases = {rNeg = "rN", Stealth = "Stlth"}
 local talisman_property_types = {
   rF = "resist", rC = "resist", rPois = "resist", rN = "resist",
   rElec = "resist", rCorr = "resist", Will = "resist",
   Str = "stat", Int = "stat", Dex = "stat", Stlth = "stealth",
-}
+};
 
 -- Extract talisman properties from their description
 -- Overcomplicated much?
