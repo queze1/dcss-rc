@@ -291,16 +291,6 @@ add_autopickup_func(pickup_equipment)
 -- HELPER FUNCTIONS
 -- =========================
 
--- Helper function to check if a list contains a value
-function contains(list, value)
-  for _, v in ipairs(list) do
-    if v == value then
-      return true
-    end
-  end
-  return false
-end
-
 -- Helper function generating all coords in LOS
 function LOSCoords()
   local coords = {}
@@ -314,14 +304,11 @@ end
 
 -- Helper function returning true if a hostile creature is in LOS
 function IsEnemyInLOS()
-  for _, c in ipairs(LOSCoords()) do
+  return util.exists(LOSCoords(), function(c)
     local m = monster.get_monster_at(c.x, c.y)
     -- 0 = hostile, 1 = neutral, 2 = strict neutral, 3 = good neutral, 4 = friendly
-    if m and m:attitude() < 1 and not m:is_safe() then
-      return true
-    end
-  end
-  return false
+    return m and m:attitude() < 1 and not m:is_safe()
+  end)
 end
 
 -- Helper function which finds a message in the buffer containing a pattern
@@ -572,17 +559,14 @@ function SafeDownstairs()
   end
 
   local s_branches = {"Shoals", "Swamp", "Snake", "Spider"}
-  local in_s_branch = contains(s_branches, branch)
+  local in_s_branch = util.contains(s_branches, branch)
 
   -- Warn before entering the fourth floor of an S-branch for the first time before exploring another
   if in_s_branch and depth == 3 and deepest_current < 4 then
-    local explored_another_s_branch = false
-    for _, s_branch in ipairs(s_branches) do
-      if s_branch ~= branch and (travel.find_deepest_explored(s_branch) or 0) > 0 then
-        explored_another_s_branch = true
-        break
-      end
-    end
+    local explored_another_s_branch = util.exists(s_branches, function(s_branch)
+      return s_branch ~= branch
+        and (travel.find_deepest_explored(s_branch) or 0) > 0
+    end)
 
     if not explored_another_s_branch then
       if crawl.yesno("Really go downstairs to the last level before exploring another S-branch?") then
