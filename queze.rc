@@ -299,7 +299,7 @@ add_autopickup_func(pickup_equipment)
 # Removed keysends on id_warn so it can be used with my preexisting macros
 {
 -- Called when a message is logged
-function c_message(text, channel)
+function NoteFadedAltar(text)
   -- Note faded altar offerings
   if text:find("This altar belongs to") then
     a, b, c = text:match("%(a%) ([%w%s]+), %(b%) ([%w%s]+) or %(c%) ([%w%s]+),")
@@ -654,6 +654,7 @@ function get_dream_dust_success_rate()
     return rate
 end
 
+local pending_message_warnings = {}
 local pending_player_warnings = {}
 
 local HP_WARN_T2_PERCENT = 60
@@ -957,6 +958,13 @@ local status = {
             end
         end
     end,
+    _issue_message_log_warnings = function(self)
+        local warnings = pending_message_warnings
+        pending_message_warnings = {}
+        for _,warning in ipairs(warnings) do
+            self:_warn(warning)
+        end
+    end,
     _update_player_warnings = function(self)
         update_hp_warning()
     end,
@@ -989,10 +997,7 @@ local message_log_threat_table = {
            tier = 3,
          reason = "Malevolent teleportation!"} , }
 
--- ch_stop_running preempts(?) c_message, so here we track state, and defer acting on it until the next ready().
--- TODO: check messages for whether the player was shafted / teleported, and if so, stop reissuing autoexplore?
--- I don't want the script blindly re-issuing actions if the floor situation has changed.
-function c_message(text, channel)
+function IssueMessageWarnings(text)
     for _,threat in ipairs(message_log_threat_table) do
         if string.find(text, threat.conditions) then
             table.insert(pending_message_warnings, {name = threat.reason, tier = threat.tier, reason = threat.reason, last_warned = nil})
@@ -1476,6 +1481,11 @@ function OpenSkills()
     need_skills_opened = false
     crawl.sendkeys("m")
   end
+end
+
+function c_message(text, channel)
+  NoteFadedAltar(text)
+  IssueMessageWarnings(text)
 end
  
 function ready()
