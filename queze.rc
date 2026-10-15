@@ -844,6 +844,7 @@ end
 ######################################################################
 
 bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
+bindkey = [~] CMD_LUA_CONSOLE
 
 # Hold Ctrl to shout walk
 # May require remapping Ctrl-N in browser (e.g. Ctrl-Alt-N)
