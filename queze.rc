@@ -1471,7 +1471,7 @@ function FelidZE()
 end
 
 -- =========================
--- HOOKS
+-- SKILLS
 -- =========================
 
 -- Opens skill menu at the beginning of the game
@@ -1482,6 +1482,10 @@ function OpenSkills()
     crawl.sendkeys("m")
   end
 end
+
+-- =========================
+-- HOOKS
+-- =========================
 
 function c_message(text, channel)
   NoteFadedAltar(text)
