@@ -903,7 +903,10 @@ local status = {
              reason = "Smiter in LOS and HP below 50, watch out!"} ,
         {conditions = {check(mons, "Blink Allies Encircling")},
                tier = 2,
-             reason = "Encircling blink in LOS, watch out!"} , }
+             reason = "Encircling blink in LOS, watch out!"} ,
+        {conditions = {check(mons, "Siphon Essence"), not you.torment_immune()},
+               tier = 3,
+             reason = "Siphon Essence (torment) and not torment immune!"} , }
 
         -- TODO: handle radroach irradiate
         -- TODO: handle ophan "Holy Flames" vs. unholy/undead player check
