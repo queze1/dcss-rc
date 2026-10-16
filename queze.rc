@@ -1091,6 +1091,8 @@ end
 function IsDownstair(feature)
   if feature == nil then
     return false
+  elseif string.find(feature, "enter_shop") then
+    return false
   elseif string.find(feature, "stairs_down") then
     return true
   elseif string.find(feature, "escape_hatch_down") then
