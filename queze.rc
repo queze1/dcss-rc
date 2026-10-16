@@ -898,6 +898,7 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- by me
+        -- TODO: Siphon Essence check not working? check seems to not be working in general
         {conditions = {check(mons, "Smiting"), you.hp() < 50},
                tier = 2,
              reason = "Smiter in LOS and HP below 50, watch out!"} ,
