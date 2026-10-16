@@ -1251,7 +1251,7 @@ function SafeUpstairs()
   local feature = view.feature_at(0, 0)
 
   -- Warn before using an escape hatch
-  if string.find(view.feature_at(0, 0), "escape_hatch_up") then
+  if string.find(feature, "escape_hatch_up") then
     if not crawl.yesno("Really use the escape hatch?") then
       return
     end
