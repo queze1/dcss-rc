@@ -1249,6 +1249,14 @@ function SafeUpstairs()
   id_warn() -- from rypo
 
   local feature = view.feature_at(0, 0)
+
+  -- Warn before using an escape hatch
+  if string.find(view.feature_at(0, 0), "escape_hatch_up") then
+    if not crawl.yesno("Really use the escape hatch?") then
+      return
+    end
+  end
+
   mark_return_stair = IsUpstair(feature) and IsEnemyInLOS()
   crawl.do_commands({"CMD_GO_UPSTAIRS"})
 end
@@ -1320,6 +1328,7 @@ function SafeDownstairs()
     end
   end
 
+  -- Warn before using an escape hatch
   if string.find(view.feature_at(0, 0), "escape_hatch_down") then
     if not crawl.yesno("Really use the escape hatch?") then
       return
