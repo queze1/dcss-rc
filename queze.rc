@@ -12,6 +12,7 @@ show_paged_inventory = false
 travel_delay = -1
 explore_delay = -1
 rest_delay = -1
+explore_wall_bias = 3
 rest_wait_both = true
 rest_wait_ancestor = true
 explore_stop += greedy_items
