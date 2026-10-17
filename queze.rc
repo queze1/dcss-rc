@@ -394,28 +394,20 @@ local current_threats = {}
 local known_threats = {}
 
 -- Check if an ability exists within the monster's spellbook.
--- This checks innate/demonic abilities and spells, but cannot check draconian breath abilities.
 -- The third parameter is optional, and tests if the ability deals more than the given damage.
 -- @param mons mons
 -- @param string ability name
 -- @param number[opt="nil"] damage optional
 -- @return bool
 function check(mons, ability_string, damage)
-    damage = damage or nil
-    local books = nil
-    books = mons:spells()
-    if books ~= nil then
-        for _,book in ipairs(books) do
-            if util.contains(book, ability_string) then
-                if damage ~= nil then
-                    return check_abil_dam(mons, ability_string) > damage
-                else
-                    return true
-                end
-            end
-        end
+    if not util.contains(mons:spells() or {}, ability_string) then
+        return false
     end
-    return false
+    if damage == nil then
+        return true
+    end
+    local ability_damage = check_abil_dam(mons, ability_string)
+    return ability_damage ~= nil and ability_damage > damage
 end
 
 -- lua string.find() returns an index, not a bool, if a pattern match is found,
@@ -898,7 +890,6 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- by me
-        -- TODO: Siphon Essence check not working? check seems to not be working in general
         {conditions = {check(mons, "Smiting"), you.hp() < 50},
                tier = 2,
              reason = "Smiter in LOS and HP below 50, watch out!"} ,
