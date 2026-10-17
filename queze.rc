@@ -897,6 +897,9 @@ local status = {
         {conditions = {check(mons, "Blink Allies Encircling")},
                tier = 2,
              reason = "Encircling blink in LOS, watch out!"} ,
+        {conditions = {check_abil_pct(mons, "Dimension Anchor") ~= nil and check_abil_pct(mons, "Dimension Anchor") > 5},
+               tier = 2,
+             reason = "Dimension Anchor " .. (check_abil_pct(mons, "Dimension Anchor") or "buggy") .. "%, equip more Will?"} ,
         {conditions = {check(mons, "Siphon Essence"), not you.torment_immune()},
                tier = 3,
              reason = "Siphon Essence (torment) and not torment immune!"} , }
