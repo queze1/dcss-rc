@@ -1271,6 +1271,13 @@ function SafeUpstairs()
     end
   end
 
+  -- Warn before extinguishing the Black Torch
+  if you.status("Torch") then
+    if not crawl.yesno("Really end your conquest for Yredelemnul?") then
+      return
+    end
+  end
+
   mark_return_stair = IsUpstair(feature) and IsEnemyInLOS()
   crawl.do_commands({"CMD_GO_UPSTAIRS"})
 end
@@ -1296,6 +1303,13 @@ function SafeDownstairs()
   if not IsDownstair(view.feature_at(0, 0)) then
     crawl.do_commands({"CMD_GO_DOWNSTAIRS"})
     return
+  end
+
+  -- Warn before extinguishing the Black Torch
+  if you.status("Torch") then
+    if not crawl.yesno("Really end your conquest for Yredelemnul?") then
+      return
+    end
   end
 
   local return_stair_x, return_stair_y = travel.waypoint_delta(9)
