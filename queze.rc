@@ -1053,6 +1053,9 @@ end
 
 -- Helper function which finds a message in the buffer containing a pattern
 -- If a subsequent message matches the stop pattern, return nil
+local done_exploring_branch
+local done_exploring_depth
+
 function FindMessage(match, stop)
   local counter = 1
   -- Check at most 100 messages
@@ -1064,7 +1067,7 @@ function FindMessage(match, stop)
     if string.find(message, match) then
       return message
     end
-    if string.find(message, stop) then
+    if stop and string.find(message, stop) then
       return
     end
   end
@@ -1256,6 +1259,19 @@ ShoutWalkMapper()
 
 local mark_return_stair
 
+function DoneExploringCurrentFloor()
+  return done_exploring_branch == you.branch()
+    and done_exploring_depth == you.depth()
+    and FindMessage("Done exploring%.") ~= nil
+end
+
+function WarnBlackTorch()
+  if you.status("Torch") and not DoneExploringCurrentFloor() then
+    return crawl.yesno("Really end your conquest for Yredelemnul?")
+  end
+  return true
+end
+
 function SafeUpstairs()
   -- from rypo
   if id_warn() then
@@ -1272,10 +1288,8 @@ function SafeUpstairs()
   end
 
   -- Warn before extinguishing the Black Torch
-  if you.status("Torch") then
-    if not crawl.yesno("Really end your conquest for Yredelemnul?") then
-      return
-    end
+  if not WarnBlackTorch() then
+    return
   end
 
   mark_return_stair = IsUpstair(feature) and IsEnemyInLOS()
@@ -1306,10 +1320,8 @@ function SafeDownstairs()
   end
 
   -- Warn before extinguishing the Black Torch
-  if you.status("Torch") then
-    if not crawl.yesno("Really end your conquest for Yredelemnul?") then
-      return
-    end
+  if not WarnBlackTorch() then
+    return
   end
 
   local return_stair_x, return_stair_y = travel.waypoint_delta(9)
@@ -1533,6 +1545,12 @@ end
 -- =========================
 
 function c_message(text, channel)
+  -- Note the current branch and depth when done exploring
+  if string.find(text, "Done exploring%.") then
+    done_exploring_branch = you.branch()
+    done_exploring_depth = you.depth()
+  end
+
   NoteFadedAltar(text)
   IssueMessageWarnings(text)
 end
