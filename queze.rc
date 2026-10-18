@@ -309,6 +309,17 @@ function NoteFadedAltar(text)
 end
 
 ---------------------------------
+--- Safe Channel Macro        ---
+---------------------------------
+-- Wait but only if you're channeling a spell.
+-- We bind this above with macros += M S ===safe_channel
+
+function safe_channel()
+  if you.channelled_spell() then crawl.sendkeys("s")
+  else crawl.mpr("You are not channelling a spell!") end
+end
+
+---------------------------------
 --- Identification Notify     ---
 ---------------------------------
 -- Print a warning when going downstairs if it looks like you need to ID items.
@@ -1548,6 +1559,7 @@ macros += M 7 zf
 macros += M 8 zg
 macros += M 9 zh
 macros += M w ===FelidZE
+macros += M S ===safe_channel
 
 # Guards
 macros += M o ===SafeExplore
