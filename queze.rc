@@ -324,13 +324,14 @@ end
 ---------------------------------
 -- Print a warning when going downstairs if it looks like you need to ID items.
 -- We bind this above with [macros += M < ===id_warn_up] and [macros += M > ===id_warn_down]
+-- Return true on a cancel
 function id_warn()
   -- return early if we're not on stairs (you use <> for portals and shops too)
   local standing_on = view.feature_at(0,0)
   if standing_on == "enter_shop" or
     (not (standing_on:find("stairs") or standing_on:find("hatch") or standing_on:find("enter") or standing_on:find("exit"))) then
       -- crawl.sendkeys(keycode)
-      return
+      return false
   end
 
   -- look for unidentified items return early if there are none
@@ -338,7 +339,7 @@ function id_warn()
   local unid = util.filter(is_unid, items.inventory())
   if unid == nil or #unid == 0 then
     -- crawl.sendkeys(keycode)
-    return
+    return false
   end
 
   -- print how many unidentified items we have
@@ -370,12 +371,12 @@ function id_warn()
       local proceed = crawl.yesno("You have ID scrolls. Proceed anyway? (y/n)", true)
       if not proceed then
         crawl.mpr("Okay then.")
-        return
+        return true
       end
   end
 
   -- If they agreed to the prompt or there were no ID scrolls, just do the action
-  -- crawl.sendkeys(keycode)
+  return false
 end
 }
 
@@ -1256,7 +1257,10 @@ ShoutWalkMapper()
 local mark_return_stair
 
 function SafeUpstairs()
-  id_warn() -- from rypo
+  -- from rypo
+  if id_warn() then
+    return
+  end
 
   local feature = view.feature_at(0, 0)
 
