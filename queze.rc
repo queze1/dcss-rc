@@ -903,9 +903,9 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- by me
-        {conditions = {check(mons, "Smiting"), you.hp() < 50},
+        {conditions = {check(mons, "Smiting"), you.hp() < 100},
                tier = 2,
-             reason = "Smiter in LOS and HP below 50, watch out!"} ,
+             reason = "Smiter in LOS and HP below 100, watch out!"} ,
         {conditions = {check(mons, "Blink Allies Encircling")},
                tier = 2,
              reason = "Encircling blink in LOS, watch out!"} ,
