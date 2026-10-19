@@ -1053,9 +1053,6 @@ end
 
 -- Helper function which finds a message in the buffer containing a pattern
 -- If a subsequent message matches the stop pattern, return nil
-local done_exploring_branch
-local done_exploring_depth
-
 function FindMessage(match, stop)
   local counter = 1
   -- Check at most 100 messages
@@ -1258,6 +1255,8 @@ ShoutWalkMapper()
 -- =========================
 
 local mark_return_stair
+local done_exploring_branch
+local done_exploring_depth
 
 function DoneExploringCurrentFloor()
   return done_exploring_branch == you.branch()
@@ -1266,7 +1265,7 @@ function DoneExploringCurrentFloor()
 end
 
 function WarnBlackTorch()
-  if you.status("Torch") and not DoneExploringCurrentFloor() then
+  if you.status("lit torch") and not DoneExploringCurrentFloor() then
     return crawl.yesno("Really end your conquest for Yredelemnul?")
   end
   return true
