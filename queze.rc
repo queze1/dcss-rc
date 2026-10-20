@@ -871,10 +871,9 @@ local status = {
                tier = 3,
              reason = mons:speed_description() .. " simulacrum and no rC, watch out!!"} ,
 
-        {conditions = {mons:is("ready_to_howl"), you.branch() ~= "Zig",
-                       check_abil_pct(mons, "Doom Howl") ~= nil and check_abil_pct(mons, "Doom Howl") > 5},
+        {conditions = {check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5},
                tier = 3,
-             reason = "Doom Howl " .. (check_abil_pct(mons, "Doom Howl") or "buggy") .. "%, equip more Will or hex it or something"} ,
+             reason = "Oblivion Howl " .. (check_abil_pct(mons, "Oblivion Howl") or "buggy") .. "%, equip more Will or hex it or something"} ,
         {conditions = {check(mons, "Symbol of Torment"), not you.torment_immune()},
                tier = 3,
              reason = "Torment and not torment immune!"} ,
