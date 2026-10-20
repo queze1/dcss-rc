@@ -1049,6 +1049,14 @@ function IsEnemyInLOS()
   end)
 end
 
+-- Helper function returning true if an awake hostile creature is in LOS
+function IsAwakeEnemyInLOS()
+  return util.exists(LOSCoords(), function(c)
+    local m = monster.get_monster_at(c.x, c.y)
+    return m and m:attitude() < 1 and not m:is_safe() and not m:status("asleep")
+  end)
+end
+
 -- Helper function which finds a message in the buffer containing a pattern
 -- If a subsequent message matches the stop pattern, return nil
 function FindMessage(match, stop)
@@ -1512,7 +1520,7 @@ function AutoInscribe()
 end
 
 -- =========================
--- SPELLCASTING
+-- OTHER MACROS
 -- =========================
 
 -- Repurpose (w)ield for spellcasting, but only for felids
@@ -1522,6 +1530,55 @@ function FelidZE()
   else
     crawl.do_commands({"CMD_WIELD_WEAPON"})
   end
+end
+
+
+local waiting_until_wake = false
+local turns_waited = 0
+
+-- Wait until an enemy wakes up
+function WaitUntilWake()
+  if not IsEnemyInLOS() then
+    crawl.mpr("No enemies are in view!")
+    return
+  end
+
+  if IsAwakeEnemyInLOS() then
+    crawl.mpr("Awake enemies are in view!")
+    return
+  end
+
+  if not crawl.yesno("Really wait until a monster wakes up?") then
+    return
+  end
+
+  -- Set waiting flag
+  waiting_until_wake = true
+  turns_waited = 1
+  crawl.do_commands({"CMD_WAIT"})
+end
+
+function WaitUntilWakeManager()
+  if not waiting_until_wake then
+    return
+  end
+
+  if IsAwakeEnemyInLOS() then
+    crawl.mpr("An awake monster is in view. Waited " .. turns_waited .. " turns.")
+    waiting_until_wake = false
+    turns_waited = 0
+    return
+  end
+
+  if not IsEnemyInLOS() then
+    crawl.mpr("No enemies are in view. Waited " .. turns_waited .. " turns.")
+    waiting_until_wake = false
+    turns_waited = 0
+    return
+  end
+
+  turns_waited = turns_waited + 1
+  crawl.do_commands({"CMD_WAIT"})
 end
 
 -- =========================
@@ -1554,12 +1611,14 @@ end
  
 function ready()
   OpenSkills()
+
   WarnThreats()
   AnnounceDamage()
 
+  AutoInscribe()
   MarkReturnStair()
   ShoutWalkManager()
-  AutoInscribe()
+  WaitUntilWakeManager()
 end
 }
 
@@ -1594,7 +1653,11 @@ macros += M 9 zh
 macros += M w ===FelidZE
 macros += M S ===safe_channel
 
-# Guards
+# Exploration
 macros += M o ===SafeExplore
 macros += M < ===SafeUpstairs
 macros += M > ===SafeDownstairs
+
+# Alt-. to wait until an enemy wakes up
+macros += M \{190} ===WaitUntilWake
+
