@@ -53,12 +53,12 @@ confirm_action += Death's Door
 confirm_action += Revivification
 confirm_action += Silence
 confirm_action += Torment
-confirm_action += Blink
 confirm_action += Rending Blade
 confirm_action += Fugue of the Fallen, Swiftness, Ozocubu's Armour
 confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Greater Servant of Makhleb, Lesser Servant of Makhleb, Fiery Armour, Foxfire Swarm, Rising Flame, Draw Stack, Channel Magic, Divine Exegesis, Finesse, Death's Door, Evoke Invisibility, Unearth Wretches, Torment
 
 force_spell_targeter += Animate Dead
+force_spell_targeter += Blink
 force_spell_targeter += Iskenderun's Mystic Blast
 force_spell_targeter += Malign Gateway
 force_spell_targeter += Ozocubu's Refrigeration
