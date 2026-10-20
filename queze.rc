@@ -1053,7 +1053,7 @@ end
 function IsAwakeEnemyInLOS()
   return util.exists(LOSCoords(), function(c)
     local m = monster.get_monster_at(c.x, c.y)
-    return m and m:attitude() < 1 and not m:is_safe() and not m:status("asleep")
+    return m and m:attitude() < 1 and not m:is_safe() and not m:status("asleep") and not m:status("dormant")
   end)
 end
 
