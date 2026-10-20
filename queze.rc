@@ -901,6 +901,9 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- by me
+        {conditions = {check_abil_pct(mons, "Confuse") ~= nil and check_abil_pct(mons, "Confuse") > 5},
+               tier = 2,
+             reason = "Confuse " .. (check_abil_pct(mons, "Confuse") or "buggy") .. "%, equip more Will?"} ,
         {conditions = {check(mons, "Smiting"), you.hp() < 100},
                tier = 2,
              reason = "Smiter in LOS and HP below 100, watch out!"} ,
