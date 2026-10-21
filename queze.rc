@@ -871,9 +871,6 @@ local status = {
                tier = 3,
              reason = mons:speed_description() .. " simulacrum and no rC, watch out!!"} ,
 
-        {conditions = {check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5},
-               tier = 3,
-             reason = "Oblivion Howl " .. (check_abil_pct(mons, "Oblivion Howl") or "buggy") .. "%, equip more Will or hex it or something"} ,
         {conditions = {check(mons, "Symbol of Torment"), not you.torment_immune()},
                tier = 3,
              reason = "Torment and not torment immune!"} ,
@@ -901,9 +898,15 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- by me
+        {conditions = {check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5},
+               tier = 3,
+             reason = "Oblivion Howl " .. (check_abil_pct(mons, "Oblivion Howl") or "buggy") .. "%, equip more Will or hex it or something"} ,
         {conditions = {check_abil_pct(mons, "Confuse") ~= nil and check_abil_pct(mons, "Confuse") > 5},
                tier = 2,
              reason = "Confuse " .. (check_abil_pct(mons, "Confuse") or "buggy") .. "%, equip more Will?"} ,
+        {conditions = {check_abil_pct(mons, "Mass Confusion") ~= nil and check_abil_pct(mons, "Mass Confusion") > 5},
+               tier = 2,
+             reason = "Mass Confusion " .. (check_abil_pct(mons, "Mass Confusion") or "buggy") .. "%, equip more Will?"} ,
         {conditions = {check(mons, "Smiting"), you.hp() < 100},
                tier = 2,
              reason = "Smiter in LOS and HP below 100, watch out!"} ,
