@@ -240,8 +240,8 @@ end
 local pending_message_warnings = {}
 local pending_player_warnings = {}
 
-local HP_WARN_T2_PERCENT = 60
-local HP_WARN_T3_PERCENT = 40
+local HP_WARN_T2_PERCENT = 70
+local HP_WARN_T3_PERCENT = 50
 local LAST_HP = math.huge
 
 function construct_hp_warning()
