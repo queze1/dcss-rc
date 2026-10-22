@@ -108,3 +108,54 @@ function debug_feature(x, y)
     local feature = view.feature_at(x, y)
     crawl.mpr("Feature at " .. x .. "," .. y .. ": " .. feature)
 end
+
+-- Debug function to print item info
+function debug_item(slot)
+    local item = items.inslot(items.letter_to_index(slot))
+    if not item then
+        crawl.mpr("No item in slot " .. tostring(slot))
+        return
+    end
+
+    local lines = {}
+    local function add_attribute(label, value)
+        if value ~= nil then
+            lines[#lines + 1] = label .. ": " .. tostring(value)
+        end
+    end
+
+    add_attribute("Name", item.name())
+
+    local rarity
+    if item.artefact then
+        rarity = "artefact"
+    elseif item.branded then
+        rarity = "branded"
+    else
+        rarity = "plain"
+    end
+    add_attribute("Rarity", rarity)
+    add_attribute("Plus", item.plus)
+    add_attribute("Ego", item.ego())
+
+    if item.artprops then
+        local keys = {}
+        for key in pairs(item.artprops) do
+            keys[#keys + 1] = key
+        end
+        table.sort(keys, function(a, b)
+            return tostring(a) < tostring(b)
+        end)
+
+        lines[#lines + 1] = "Artprops:"
+        if #keys == 0 then
+            lines[#lines + 1] = "  {}"
+        else
+            for _, key in ipairs(keys) do
+                lines[#lines + 1] = "  " .. tostring(key) .. ": " .. tostring(item.artprops[key])
+            end
+        end
+    end
+
+    crawl.mpr(table.concat(lines, "\n"))
+end
