@@ -1,5 +1,6 @@
 -- From HilariousDeathArtist as of 22/10/2026
 -- https://github.com/HilariousDeathArtist/DCSSConfigFile/blob/master/HDamage.txt
+-- Slightly modified to --- more --- on "MASSIVE DAMAGE"
 
 local previous_hp = 0
 local previous_mp = 0
@@ -79,6 +80,7 @@ function AnnounceDamage()
                 end
                 if hp_difference > (max_hp * 0.20) then
                     crawl.mpr("<lightred>MASSIVE DAMAGE!!</lightred>")
+                    crawl.more()
                 end
             end
 
