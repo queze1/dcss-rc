@@ -393,7 +393,6 @@ local DEBUG_MONS_STATUS = false
 local DEBUG_MONS_FLAGS = false
 local DEBUG_MONS_DESC = false
 local DEBUG_MONS_TARGET_DESC = false
-local DEBUG_LOF_PATH = false
 local DEBUG_THREATS = false
 local DEBUG_ABIL_XDY = false
 local DEBUG_ABIL_DAM = false
@@ -528,32 +527,6 @@ end
 local function same_coords(c1x, c1y, c2x, c2y)
     if c1x == c2x and c1y == c2y then return true end
     return false
-end
-
--- test if we have line of fire to this mons
--- @param mons mons
--- @param[opt="Magic Dart"] string optional, test LOF using this spell name
--- @return bool false if LOF is blocked or the spell path to mons is disjoint,
---              true if spell has clear LOF to mons from the player's position
-function check_lof(mons, spell)
-    local path = nil
-    spell = spell or "Magic Dart"
-    path = spells.path(spell, mons:pos())
-    if path == nil then return false end
-
-    if DEBUG_LOF_PATH == true then
-        crawl.mpr(spell .. " path to " .. mons:name() .. ": ")
-        for _,vertex in ipairs(path) do
-            crawl.mpr(vertex[1] .. "," .. vertex[2])
-        end
-    end
-
-    -- TODO: this test is buggy with Hep ancestors, because they can be fired through, FIXME
-    if not same_coords(path[#path][1], path[#path][2], mons:pos()) then
-        if DEBUG_LOF_PATH == true then crawl.mpr("LOF blocked to " .. mons:name() .. "?") end
-        return false
-    end
-    return true
 end
 
 function debug_mpr_current_threats()
@@ -735,7 +708,6 @@ local status = {
         if DEBUG_MONS_FLAGS == true then debug_mpr_mons_flags(mons) end
         if DEBUG_MONS_DESC == true then crawl.mpr(mons:name() .. " desc: " .. mons:desc(true) ) end
         if DEBUG_MONS_TARGET_DESC == true then crawl.mpr(mons:name() .. " target_desc: " .. mons:target_desc() ) end
-        if DEBUG_LOF_PATH == true then check_lof(mons, "Magic Dart") end
 
 
 -- begin danger table
@@ -834,13 +806,6 @@ local status = {
         {conditions = {check_tdesc(mons, "boomerang"), you.branch() ~= "Zig"},
                tier = 2,
              reason = "Quivering boomerangs, careful!"} ,
-        {conditions = {check(mons, "Malmutate"), you.branch() ~= "Zig"},
-               tier = 2,
-             reason = "Malmutator in LOS"} ,
-        -- XXX: I'd prefer to check lof against "Malmutate" here, but it seems like spells.path() only works with player spells?
-        {conditions = {check(mons, "Malmutate"), check_lof(mons), you.branch() ~= "Zig"},
-               tier = 2,
-             reason = "Malmutator in LOF!"} ,
         {conditions = {mons:name() == "orb of fire", you.res_fire() < 3},
                tier = 3,
              reason = "Orb of Fire and low rF"} ,
@@ -898,6 +863,9 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- by me
+        {conditions = {check(mons, "Malmutate"),
+               tier = 2,
+             reason = "Malmutator in LOS!"} ,
         {conditions = {check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5},
                tier = 3,
              reason = "Oblivion Howl " .. (check_abil_pct(mons, "Oblivion Howl") or "buggy") .. "%, equip more Will or hex it or something"} ,
