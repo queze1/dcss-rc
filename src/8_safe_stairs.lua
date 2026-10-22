@@ -15,12 +15,32 @@ function warn_black_torch()
     return true
 end
 
+-- Save a downstair in waypoint 9, if enemies were in LOS when going upstairs
+function MarkReturnStair()
+    if not mark_return_stair then
+        return
+    end
+
+    if is_downstair(view.feature_at(0, 0)) then
+        crawl.mpr("<lightred>Staircase saved. Enemies were in view.</lightred>")
+        travel.set_waypoint(9, 0, 0)
+    end
+
+    mark_return_stair = false
+end
+
 function SafeUpstairs()
     if id_warn() then
         return
     end
 
     local feature = view.feature_at(0, 0)
+
+    -- Just do it if not a stair
+    if not is_upstair(feature) then
+        crawl.do_commands({ "CMD_GO_UPSTAIRS" })
+        return
+    end
 
     -- Warn before using an escape hatch
     if string.find(feature, "escape_hatch_up") then
@@ -38,25 +58,15 @@ function SafeUpstairs()
     crawl.do_commands({ "CMD_GO_UPSTAIRS" })
 end
 
--- Save a downstair in waypoint 9, if enemies were in LOS when going upstairs
-function MarkReturnStair()
-    if not mark_return_stair then
+function SafeDownstairs()
+    if id_warn() then
         return
     end
 
-    if is_downstair(view.feature_at(0, 0)) then
-        crawl.mpr("<lightred>Staircase saved. Enemies were in view.</lightred>")
-        travel.set_waypoint(9, 0, 0)
-    end
+    local feature = view.feature_at(0, 0)
 
-    mark_return_stair = false
-end
-
--- Prompt when going downstairs in dangerous situations
-function SafeDownstairs()
-    id_warn()
-
-    if not is_downstair(view.feature_at(0, 0)) then
+    -- Just do it if not a stair
+    if not is_downstair(feature) then
         crawl.do_commands({ "CMD_GO_DOWNSTAIRS" })
         return
     end
@@ -66,6 +76,7 @@ function SafeDownstairs()
         return
     end
 
+    -- Warn when enemies were in view
     local return_stair_x, return_stair_y = travel.waypoint_delta(9)
     if return_stair_x == 0 and return_stair_y == 0 then
         if not crawl.yesno("Really use the return stair? Enemies were in view.") then
@@ -75,17 +86,20 @@ function SafeDownstairs()
 
     local branch = you.branch()
     local depth = you.depth()
-    local deepest_current = travel.find_deepest_explored(branch) or 0
     local deepest_depths = travel.find_deepest_explored("Depths") or 0
+    local would_descend = string.find(feature, "stairs_down") or
+        string.find(feature, "escape_hatch_down") -- excludes branch entrances & portals
 
     -- Prevent going to Vaults:5 before Depths
-    if branch == "Vaults" and depth == 4 and deepest_depths == 0 then
+    if branch == "Vaults" and depth == 4 and deepest_depths == 0 and would_descend then
         crawl.mpr("<lightred>Visit Depths before doing Vaults:5, please.</lightred>")
         return
     end
 
+    local deepest_current = travel.find_deepest_explored(branch) or 0
+
     -- Warn before going to V:5 for the first time
-    if branch == "Vaults" and depth == 4 and deepest_current < 5 then
+    if branch == "Vaults" and depth == 4 and deepest_current < 5 and would_descend then
         if crawl.yesno("Are you really prepared to enter Vaults:5?") then
             crawl.do_commands({ "CMD_GO_DOWNSTAIRS" })
             return
@@ -96,7 +110,7 @@ function SafeDownstairs()
     local in_s_branch = util.contains(s_branches, branch)
 
     -- Warn before entering the fourth floor of an S-branch for the first time before exploring another
-    if in_s_branch and depth == 3 and deepest_current < 4 then
+    if in_s_branch and depth == 3 and deepest_current < 4 and would_descend then
         local explored_another_s_branch = util.exists(s_branches, function(s_branch)
             return s_branch ~= branch
                 and (travel.find_deepest_explored(s_branch) or 0) > 0
