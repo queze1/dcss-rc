@@ -167,52 +167,10 @@ function check_rare_ood(m)
     return mdepth > you_depth + ood_threshold and mprob < 2
 end
 
--- This function is patterned after player::undead_state(), for purpose of checking Dispel Undead vulnerability.
--- As found in bolt::affect_player_enchantment , all undead states not (you.undead_state() == US_ALIVE) are vulnerable to DU.
--- @param bool exempt_living_vp
--- @return bool
-function you_are_undead(exempt_living_vp)
-    assert(type(exempt_living_vp) == "boolean")
-    -- if (form == transformation::death)
-    local transform = you.transform()
-    if transform == "death" then return true end
-    -- return species::undead_type(species);
-    -- it looks like this ultimately returns the undead_type in the species yamls, after a few indirect calls
-    -- ghoul and mummy are US_UNDEAD, vampire is US_SEMI_UNDEAD, grep "undead_type" didn't find any others here.
-    local species = you.race()
-    if species == "Ghoul" or species == "Mummy" then
-        return true
-    end
-    -- If exempt_living_vp is passed as true, we deviate from player::undead_state().
-    -- This is relevant for DU Range and Undeadhunter, which check holiness, which exempts Alive Vp.
-    -- As far as I can tell, mons have no way of casting DU at Alive Vp, even though they would technically take damage from it.
-    if species == "Vampire" then
-        if exempt_living_vp == false then
-            return true
-        elseif exempt_living_vp == true and string.find(you.mutation_overview(), "alive") == nil then
-            return true
-        end
-    end
-
-    return false
-end
-
--- This function exists to check vulnerability to holy wrath weapons.
--- player::res_holy_energy() checks player::undead_or_demonic(), which returns undead_state(temp) || species == SP_DEMONSPAWN
--- Notably, that test does not exempt living vp, so we don't either.
-function you_are_unholy()
-    local species = you.race()
-    if species == "Demonspawn" then return true end
-    return you_are_undead(false)
-end
-
 -- Returns true if this mons should be treated as threatening for warning purposes.
--- This function exists because mons:is_firewood() doesn't cover all such cases.
 -- @param mons mons
 -- @return bool
 function is_threatening(mons)
-    if mons:is_firewood() and mons:name() ~= "briar patch" then return false end
-    if mons:name() == "butterfly" then return false end
     return mons:attitude() < ATT_NEUTRAL
 end
 
@@ -382,13 +340,6 @@ local status = {
                 tier = 3,
                 reason = "AF_POISON_PARALYSE and no rPois"
             },
-            -- TODO: Improve this? mons evoke power is 30 + mons.get_hit_dice(); a static will check isn't accurate here,
-            -- but the game also doesn't currently expose mons evoke success% vs. the player anywhere, as far as I can tell.
-            {
-                conditions = { check_tdesc(mons, "wand of paralysis"), you.willpower() < 3 },
-                tier = 3,
-                reason = "Wand of Paralysis and low Will"
-            },
             {
                 conditions = { check_abil_pct(mons, "Porkalator") ~= nil and check_abil_pct(mons, "Porkalator") > 5 },
                 tier = 2,
@@ -405,21 +356,10 @@ local status = {
                 reason = "Sentinel's Mark " ..
                     (check_abil_pct(mons, "Sentinel's Mark") or "buggy") .. "%, equip more Will?"
             },
-            -- comparing "distort" instead of "distortion" works against Rift, randarts, and panlord "distorting touch"
-            -- TODO: check to see if this catches dancing weapons?
             {
                 conditions = { check_tdesc(mons, "[dD]istort"), you.branch() ~= "Zig" },
                 tier = 3,
                 reason = "Distortion weapon!"
-            },
-            -- elec weapons: ego, randarts + glaive of the guard + eos + storm bow, arc blade
-            {
-                conditions = { check_tdesc(mons, "of electrocution")
-                or check_tdesc(mons, "{elec")
-                or check_tdesc(mons, "arc blade"),
-                    you.res_shock() < 1, you.branch() ~= "Zig" },
-                tier = 2,
-                reason = "Electrocution weapon and no rElec!"
             },
             {
                 conditions = { check_tdesc(mons, "quivering poison"), you.res_poison() < 1, you.branch() ~= "Zig" },
@@ -502,38 +442,9 @@ local status = {
             },
 
             {
-                conditions = { string.find(mons:name(), "[sS]imulacrum") ~= nil, you.res_cold() < 1 },
-                tier = 2,
-                reason = "simulacrum and no rC, careful"
-            },
-            {
-                conditions = { string.find(mons:name(), "[sS]imulacrum") ~= nil, string.find(mons:speed_description(),
-                    "fast") ~= nil,
-                    you.res_cold() < 1 },
-                tier = 3,
-                reason = mons:speed_description() .. " simulacrum and no rC, watch out!!"
-            },
-
-            {
                 conditions = { check(mons, "Symbol of Torment"), not you.torment_immune() },
                 tier = 3,
                 reason = "Torment and not torment immune!"
-            },
-
-            {
-                conditions = { check(mons, "Dispel Undead Range"), you_are_undead(true) == true },
-                tier = 3,
-                reason = "Dispel Undead in LOS while undead!"
-            },
-            {
-                conditions = { check_tdesc(mons, "Undeadhunter"), you_are_undead(true) == true },
-                tier = 3,
-                reason = "wielding Undeadhunter while undead, watch out!!"
-            },
-            {
-                conditions = { check_tdesc(mons, "holy wrath"), you_are_unholy() == true },
-                tier = 3,
-                reason = "wielding holy wrath while unholy, watch out!!"
             },
 
             {
@@ -599,18 +510,6 @@ local status = {
                 tier = 3,
                 reason = "Siphon Essence (torment) and not torment immune!"
             }, }
-
-        -- TODO: handle radroach irradiate
-        -- TODO: handle ophan "Holy Flames" vs. unholy/undead player check
-        -- TODO: handle revenant ghostly fireball (rN check)
-        -- TODO: generic "mons carrying randart/unrand check"
-        -- TODO: handle Spit Acid and no rCorr
-        -- TODO: handle Corrosive Bolt and no rCorr
-        -- TODO: look into which other rCorr abilities should be warned
-        -- TODO: "if it's unique, and asleep, and at abs(maxlos) from 0,0", auto set an exclude
-        -- maybe do the same thing if it's OOD? or tripping any huge damage / rF+++ flags?
-        -- TODO: I need to add active status warnings for dangerous player status to this script;
-        -- things like petrifying or howl or standing-in-dangerous-cloud or mark
 
         for _, entry in ipairs(danger_table) do
             assert(type(entry.conditions) == "table" and type(entry.tier) == "number" and type(entry.reason) == "string")
