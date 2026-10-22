@@ -863,7 +863,7 @@ local status = {
              reason = "Damnation (smite) in LOS, watch out!"} ,
 
         -- by me
-        {conditions = {check(mons, "Malmutate"),
+        {conditions = {check(mons, "Malmutate")} ,
                tier = 2,
              reason = "Malmutator in LOS!"} ,
         {conditions = {check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5},
