@@ -5,10 +5,10 @@ local last_action
 local next_direction
 
 -- Create a shout walk function for a direction
-function ShoutWalkCreator(direction)
+function shout_walk_creator(direction)
     return function()
         -- Do not shout walk if monsters are in LOS
-        if IsEnemyInLOS() then
+        if is_enemy_in_los() then
             crawl.mpr("There are monsters nearby!", 5)
             return
         end
@@ -54,13 +54,13 @@ function ShoutWalkManager()
     end
 
     -- Abort if an enemy is in LOS
-    if IsEnemyInLOS() then
+    if is_enemy_in_los() then
         crawl.mpr("A monster has walked into LOS. Walk canceled.", 3)
         return
     end
 
     -- Abort if a noise was made
-    local noise_made = FindMessage("You hear", "for attention")
+    local noise_made = find_message("You hear", "for attention")
     if noise_made then
         crawl.mpr("A noise has been made in response. Walk canceled.", 3)
         noise_warning = true
@@ -72,16 +72,16 @@ function ShoutWalkManager()
     last_action = "walk"
 end
 
-function ShoutWalkMapper()
-    shout_walk_y = ShoutWalkCreator("y")
-    shout_walk_u = ShoutWalkCreator("u")
-    shout_walk_h = ShoutWalkCreator("h")
-    shout_walk_b = ShoutWalkCreator("b")
-    shout_walk_n = ShoutWalkCreator("n")
-    shout_walk_j = ShoutWalkCreator("j")
-    shout_walk_k = ShoutWalkCreator("k")
-    shout_walk_l = ShoutWalkCreator("l")
+function shout_walk_mapper()
+    ShoutWalkY = shout_walk_creator("y")
+    ShoutWalkU = shout_walk_creator("u")
+    ShoutWalkH = shout_walk_creator("h")
+    ShoutWalkB = shout_walk_creator("b")
+    ShoutWalkN = shout_walk_creator("n")
+    ShoutWalkJ = shout_walk_creator("j")
+    ShoutWalkK = shout_walk_creator("k")
+    ShoutWalkL = shout_walk_creator("l")
 end
 
 -- Set up shout walk functions
-ShoutWalkMapper()
+shout_walk_mapper()

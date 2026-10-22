@@ -27,7 +27,7 @@ local inscription_properties = {
 
 -- Relies on stash annotation
 -- See https://github.com/crawl/crawl/blob/master/crawl-ref/source/dat/clua/stash.lua
-local function FindItemProperties(description)
+local function find_item_properties(description)
     local prefixes = description:match("Stash search prefixes:%s*(.-)\nMenu/colouring prefixes:")
         or description:match("Stash search prefixes:%s*(.*)")
     if not prefixes then
@@ -69,7 +69,7 @@ local talisman_property_types = {
 
 -- Extract talisman properties from their description
 -- Overcomplicated much?
-local function FindTalismanProperties(description)
+local function find_talisman_properties(description)
     local plain = description:gsub("<[^>]*>", ""):gsub("\r", "")
     local block = plain:match("\n%s*Cur%s+[^\n]*\n(.*)")
     if not block then
@@ -134,9 +134,9 @@ function AutoInscribe()
             if not item.artefact then
                 local properties
                 if item.class(true) == "talisman" then
-                    properties = FindTalismanProperties(item.description or "")
+                    properties = find_talisman_properties(item.description or "")
                 else
-                    properties = FindItemProperties(item.description or "")
+                    properties = find_item_properties(item.description or "")
                 end
 
                 if properties then

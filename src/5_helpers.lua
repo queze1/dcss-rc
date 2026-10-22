@@ -1,5 +1,5 @@
 -- Helper function generating all coords in LOS
-function LOSCoords()
+function los_coords()
     local coords = {}
     for x = -you.los(), you.los() do
         for y = -you.los(), you.los() do
@@ -10,8 +10,8 @@ function LOSCoords()
 end
 
 -- Helper function returning true if a hostile creature is in LOS
-function IsEnemyInLOS()
-    return util.exists(LOSCoords(), function(c)
+function is_enemy_in_los()
+    return util.exists(los_coords(), function(c)
         local m = monster.get_monster_at(c.x, c.y)
         -- 0 = hostile, 1 = neutral, 2 = strict neutral, 3 = good neutral, 4 = friendly
         return m and m:attitude() < 1 and not m:is_safe()
@@ -19,8 +19,8 @@ function IsEnemyInLOS()
 end
 
 -- Helper function returning true if an awake hostile creature is in LOS
-function IsAwakeEnemyInLOS()
-    return util.exists(LOSCoords(), function(c)
+function is_awake_enemy_in_los()
+    return util.exists(los_coords(), function(c)
         local m = monster.get_monster_at(c.x, c.y)
         return m and m:attitude() < 1 and not m:is_safe() and not m:status("asleep") and not m:status("dormant")
     end)
@@ -28,7 +28,7 @@ end
 
 -- Helper function which finds a message in the buffer containing a pattern
 -- If a subsequent message matches the stop pattern, return nil
-function FindMessage(match, stop)
+function find_message(match, stop)
     local counter = 1
     -- Check at most 100 messages
     while (counter < 100)
@@ -46,7 +46,7 @@ function FindMessage(match, stop)
 end
 
 -- Helper function returning true if you are completely rested
-function IsHealthy()
+function is_healthy()
     local hp, mhp = you.hp()
     local mp, mmp = you.mp()
     if hp < mhp then
@@ -60,7 +60,7 @@ function IsHealthy()
 end
 
 -- Helper function returning true if a feature is an upstair
-function IsUpstair(feature)
+function is_upstair(feature)
     if feature == nil then
         return false
     elseif string.find(feature, "stairs_up") then
@@ -74,7 +74,7 @@ function IsUpstair(feature)
 end
 
 -- Helper function returning true if a feature is an downstair
-function IsDownstair(feature)
+function is_downstair(feature)
     if feature == nil then
         return false
     elseif string.find(feature, "enter_shop") then
@@ -90,9 +90,9 @@ function IsDownstair(feature)
 end
 
 -- Helper function returning true if it's safe to autoexplore
-function IsSafe()
+function is_safe()
     local feature = view.feature_at(0, 0)
-    if IsUpstair(feature) then
+    if is_upstair(feature) then
         return true
     end
 

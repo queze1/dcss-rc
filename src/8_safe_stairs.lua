@@ -2,21 +2,21 @@ local mark_return_stair
 local done_exploring_branch
 local done_exploring_depth
 
-function DoneExploringCurrentFloor()
+function done_exploring_current_floor()
     return done_exploring_branch == you.branch()
         and done_exploring_depth == you.depth()
-        and FindMessage("Done exploring%.") ~= nil
+        and find_message("Done exploring%.") ~= nil
 end
 
-function WarnBlackTorch()
-    if you.status("lit torch") and not DoneExploringCurrentFloor() then
+function warn_black_torch()
+    if you.status("lit torch") and not done_exploring_current_floor() then
         return crawl.yesno("Really end your conquest for Yredelemnul?")
     end
     return true
 end
 
 function SafeUpstairs()
-    if IdWarn() then
+    if id_warn() then
         return
     end
 
@@ -30,11 +30,11 @@ function SafeUpstairs()
     end
 
     -- Warn before extinguishing the Black Torch
-    if not WarnBlackTorch() then
+    if not warn_black_torch() then
         return
     end
 
-    mark_return_stair = IsUpstair(feature) and IsEnemyInLOS()
+    mark_return_stair = is_upstair(feature) and is_enemy_in_los()
     crawl.do_commands({ "CMD_GO_UPSTAIRS" })
 end
 
@@ -44,7 +44,7 @@ function MarkReturnStair()
         return
     end
 
-    if IsDownstair(view.feature_at(0, 0)) then
+    if is_downstair(view.feature_at(0, 0)) then
         crawl.mpr("<lightred>Staircase saved. Enemies were in view.</lightred>")
         travel.set_waypoint(9, 0, 0)
     end
@@ -54,15 +54,15 @@ end
 
 -- Prompt when going downstairs in dangerous situations
 function SafeDownstairs()
-    IdWarn()
+    id_warn()
 
-    if not IsDownstair(view.feature_at(0, 0)) then
+    if not is_downstair(view.feature_at(0, 0)) then
         crawl.do_commands({ "CMD_GO_DOWNSTAIRS" })
         return
     end
 
     -- Warn before extinguishing the Black Torch
-    if not WarnBlackTorch() then
+    if not warn_black_torch() then
         return
     end
 
@@ -117,7 +117,7 @@ function SafeDownstairs()
         end
     end
 
-    if IsHealthy() then
+    if is_healthy() then
         crawl.do_commands({ "CMD_GO_DOWNSTAIRS" })
     elseif crawl.yesno("Really go downstairs while injured?") then
         crawl.do_commands({ "CMD_GO_DOWNSTAIRS" })

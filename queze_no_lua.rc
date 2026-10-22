@@ -109,14 +109,14 @@ bindkey = [~] CMD_LUA_CONSOLE
 
 # Hold Ctrl to shout walk
 # May require remapping Ctrl-N in browser (e.g. Ctrl-Alt-N)
-macros += M \{25} ===shout_walk_y 
-macros += M \{21} ===shout_walk_u 
-macros += M \{8} ===shout_walk_h 
-macros += M \{2} ===shout_walk_b 
-macros += M \{14} ===shout_walk_n
-macros += M \{10} ===shout_walk_j 
-macros += M \{11} ===shout_walk_k 
-macros += M \{12} ===shout_walk_l 
+macros += M \{25} ===ShoutWalkY
+macros += M \{21} ===ShoutWalkU
+macros += M \{8} ===ShoutWalkH
+macros += M \{2} ===ShoutWalkB
+macros += M \{14} ===ShoutWalkN
+macros += M \{10} ===ShoutWalkJ
+macros += M \{11} ===ShoutWalkK
+macros += M \{12} ===ShoutWalkL
 
 # Spells
 macros += M 1 za
@@ -128,7 +128,7 @@ macros += M 7 zf
 macros += M 8 zg
 macros += M 9 zh
 macros += M w ===FelidZE
-macros += M S ===safe_channel
+macros += M S ===SafeChannel
 
 # Exploration
 macros += M o ===SafeExplore
@@ -146,4 +146,3 @@ macros += M \{190} ===WaitUntilWake
 # Flash screen for scripted threat warnings
 flash_screen_message += T2
 flash_screen_message += T3
-

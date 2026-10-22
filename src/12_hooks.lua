@@ -7,7 +7,6 @@ function c_message(text, channel)
         done_exploring_depth = you.depth()
     end
 
-    NoteFadedAltar(text)
     IssueMessageWarnings(text)
 end
 

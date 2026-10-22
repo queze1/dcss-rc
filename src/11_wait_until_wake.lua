@@ -3,12 +3,12 @@ local turns_waited = 0
 
 -- Wait until an enemy wakes up
 function WaitUntilWake()
-    if not IsEnemyInLOS() then
+    if not is_enemy_in_los() then
         crawl.mpr("No enemies are in view!")
         return
     end
 
-    if IsAwakeEnemyInLOS() then
+    if is_awake_enemy_in_los() then
         crawl.mpr("Awake enemies are in view!")
         return
     end
@@ -28,14 +28,14 @@ function WaitUntilWakeManager()
         return
     end
 
-    if IsAwakeEnemyInLOS() then
+    if is_awake_enemy_in_los() then
         crawl.mpr("An awake monster is in view. Waited " .. turns_waited .. " turns.")
         waiting_until_wake = false
         turns_waited = 0
         return
     end
 
-    if not IsEnemyInLOS() then
+    if not is_enemy_in_los() then
         crawl.mpr("No enemies are in view. Waited " .. turns_waited .. " turns.")
         waiting_until_wake = false
         turns_waited = 0
