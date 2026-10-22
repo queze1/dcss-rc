@@ -1,0 +1,148 @@
+######################################################################
+#                          General Settings                          #
+######################################################################
+
+# Sets skill training to manual
+default_manual_training = true
+
+# Use old inventory layout
+show_paged_inventory = false
+
+# Travel & resting
+travel_delay = -1
+explore_delay = -1
+rest_delay = -1
+explore_wall_bias = 3
+rest_wait_both = true
+rest_wait_ancestor = true
+explore_stop += greedy_items
+travel_key_stop = false
+travel_open_doors = true
+show_travel_trail = true
+
+# Autopickup
+autopickup = $?!+"/♦%
+drop_disables_autopickup = true
+
+# Controls the speed of animations (default: 600)
+view_delay = 100
+
+autofight_stop = 70
+
+hp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
+mp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
+tile_show_threat_levels = tough, nasty, unusual
+
+# From rypo
+unusual_monster_items += Sniper
+unusual_monster_items += dark maul
+unusual_monster_items += sceptre of Torment
+unusual_monster_items += vulnerable:devious:13
+unusual_monster_items += vulnerable:venom:13
+unusual_monster_items += vulnerable:electrocution:13
+
+# Increase font size when playing offline
+tile_font_msg_size = 16
+
+show_more = false
+force_more_message += into view
+force_more_message += Your unholy channel is weakening.
+force_more_message += Found a staircase to the Ecumenical Temple
+
+confirm_action += Death's Door
+confirm_action += Revivification
+confirm_action += Torment
+confirm_action += Rending Blade
+confirm_action += Fugue of the Fallen, Swiftness, Ozocubu's Armour
+confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Greater Servant of Makhleb, Lesser Servant of Makhleb, Fiery Armour, Foxfire Swarm, Rising Flame, Draw Stack, Channel Magic, Divine Exegesis, Finesse, Death's Door, Evoke Invisibility, Unearth Wretches, Torment
+
+force_spell_targeter += Animate Dead
+force_spell_targeter += Blink
+force_spell_targeter += Silence
+force_spell_targeter += Iskenderun's Mystic Blast
+force_spell_targeter += Malign Gateway
+force_spell_targeter += Ozocubu's Refrigeration
+force_spell_targeter += Permafrost Eruption
+
+######################################################################
+#                             Spell Slots                            #
+######################################################################
+
+# Set Alias for Spell Slots
+slot := spell_slot
+
+slot += Fireball:f
+slot += Apportation:g
+slot += Slow:s
+slot += Swiftness:s
+slot += Passwall:w
+slot += Mephitic Cloud:x
+slot += Vampiric Draining:x
+slot += Iskenderun's Battlesphere:z
+slot += Lee's Rapid Deconstruction:z
+slot += Animate Dead:A
+slot += Ozocubu's Armour:A
+slot += Death's Door:D
+slot += Borgnjor's Revivification:R
+
+######################################################################
+#                           Character Dump                           #
+######################################################################
+
+note_chat_messages = true
+note_hp_percent = 25
+note_all_skill_levels = true
+user_note_prefix = --
+note_items += experience,of resistance, Archmagi
+note_items += crystal plate armour,pearl dragon scales
+note_items += artefact
+note_messages += You feel monstrous
+note_messages += You pass through the gate
+note_messages += cast .* Abyss
+
+######################################################################
+#                              Keybinds                              #
+######################################################################
+
+bindkey = [Tab] CMD_AUTOFIGHT_NOMOVE
+bindkey = [~] CMD_LUA_CONSOLE
+
+# Hold Ctrl to shout walk
+# May require remapping Ctrl-N in browser (e.g. Ctrl-Alt-N)
+macros += M \{25} ===shout_walk_y 
+macros += M \{21} ===shout_walk_u 
+macros += M \{8} ===shout_walk_h 
+macros += M \{2} ===shout_walk_b 
+macros += M \{14} ===shout_walk_n
+macros += M \{10} ===shout_walk_j 
+macros += M \{11} ===shout_walk_k 
+macros += M \{12} ===shout_walk_l 
+
+# Spells
+macros += M 1 za
+macros += M 2 zb
+macros += M 3 zc
+macros += M 4 zd
+macros += M 6 ze
+macros += M 7 zf
+macros += M 8 zg
+macros += M 9 zh
+macros += M w ===FelidZE
+macros += M S ===safe_channel
+
+# Exploration
+macros += M o ===SafeExplore
+macros += M < ===SafeUpstairs
+macros += M > ===SafeDownstairs
+
+# Alt-. to wait until an enemy wakes up
+macros += M \{190} ===WaitUntilWake
+
+
+######################################################################
+#                        Custom Lua Functions                        #
+######################################################################
+
+# Flash screen for scripted threat warnings
+flash_screen_message += T2
+flash_screen_message += T3
