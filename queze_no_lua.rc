@@ -30,7 +30,7 @@ view_delay = 100
 autofight_stop = 70
 
 # Minimum delay between autofight commands
-autofight_warning = 100
+autofight_warning = 200
 
 hp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
 mp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
