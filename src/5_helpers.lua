@@ -100,3 +100,11 @@ function is_safe()
     local mp, mmp = you.mp()
     return hp == mhp and mp == mmp
 end
+
+-- Debug function to print a feature
+function debug_feature(x, y)
+    x = x or 0
+    y = y or 0
+    local feature = view.feature_at(x, y)
+    crawl.mpr("Feature at " .. x .. "," .. y .. ": " .. feature)
+end
