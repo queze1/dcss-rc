@@ -10,3 +10,6 @@ strictly worse means
 the other talisman has a positive artifact property which it does not
 and it has no negative artifact properties which it doesn't have
 at the start of each turn, you should drop talismans which are strictly worse than any other talisman
+
+also this logic for rings
+
