@@ -510,6 +510,10 @@ local status = {
                 tier = 3,
                 reason = "Siphon Essence (torment) and not torment immune!"
             }, }
+        -- TODO: handle radroach irradiate
+        -- TODO: handle Spit Acid and no rCorr
+        -- TODO: handle Corrosive Bolt and no rCorr
+        -- TODO: "if it's unique, and asleep, and at abs(maxlos) from 0,0", auto set an exclude
 
         for _, entry in ipairs(danger_table) do
             assert(type(entry.conditions) == "table" and type(entry.tier) == "number" and type(entry.reason) == "string")
