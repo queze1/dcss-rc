@@ -6,7 +6,7 @@
 --- Identification Notify     ---
 ---------------------------------
 -- Print a warning when going downstairs if it looks like you need to ID items.
--- Return true on a cancel
+
 function IdWarn()
     -- return early if we're not on stairs (you use <> for portals and shops too)
     local standing_on = view.feature_at(0, 0)

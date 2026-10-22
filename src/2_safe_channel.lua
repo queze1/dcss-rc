@@ -5,7 +5,6 @@
 --- Safe Channel Macro        ---
 ---------------------------------
 -- Wait but only if you're channeling a spell.
--- We bind this above with macros += M S ===safe_channel
 
 function SafeChannel()
     if you.channelled_spell() then
