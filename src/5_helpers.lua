@@ -101,6 +101,68 @@ function is_safe()
     return hp == mhp and mp == mmp
 end
 
+-- Helper function returning true if the first artefact is strictly better
+-- than the second based on its properties
+function is_better_than_artefact(first, second)
+    local negative_props = {
+        ["*Noise"] = true,
+        ["-Cast"] = true,
+        ["-Tele"] = true,
+        ["*Rage"] = true,
+        ["^Contam"] = true,
+        ["*Corrode"] = true,
+        ["^Drain"] = true,
+        ["*Slow"] = true,
+        ["^Fragile"] = true,
+        ["*Silence"] = true,
+        ["Bane"] = true,
+    }
+
+    first = first or {}
+    second = second or {}
+
+    local function value(props, key)
+        local result = props[key]
+        if result == nil or result == false then
+            return 0
+        elseif result == true then
+            return 1
+        end
+        return result
+    end
+
+    local function is_negative(key, prop_value)
+        return negative_props[key] or (type(prop_value) == "number" and prop_value < 0)
+    end
+
+    local strictly_better = false
+    for key, first_value in pairs(first) do
+        first_value = value(first, key)
+        local second_value = value(second, key)
+        if is_negative(key, first_value) then
+            if first_value > second_value then
+                return false
+            elseif first_value < second_value then
+                strictly_better = true
+            end
+        elseif first_value < second_value then
+            return false
+        elseif first_value > second_value then
+            strictly_better = true
+        end
+    end
+
+    for key, second_value in pairs(second) do
+        second_value = value(second, key)
+        local first_value = value(first, key)
+        if not is_negative(key, second_value) and first_value < second_value then
+            return false
+        end
+    end
+
+    return strictly_better
+end
+
 -- Debug function to print a feature
 function debug_feature(x, y)
     x = x or 0
