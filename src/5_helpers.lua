@@ -104,6 +104,7 @@ end
 -- Helper function returning true if the first artefact is strictly better
 -- than the second based on its properties
 function is_better_than_artefact(first, second)
+    -- From https://github.com/crawl/crawl/blob/32f959a6b094e375b291c6452be3bc58c622a7bf/crawl-ref/source/artefact.cc#L894
     local negative_props = {
         ["*Noise"] = true,
         ["-Cast"] = true,
