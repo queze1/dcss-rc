@@ -157,5 +157,7 @@ function debug_item(slot)
         end
     end
 
+    add_attribute("Inscription", item.inscription)
+
     crawl.mpr(table.concat(lines, "\n"))
 end
