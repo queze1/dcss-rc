@@ -477,7 +477,7 @@ local status = {
             {
                 conditions = { check(mons, "Blink Allies Encircling") },
                 tier = 2,
-                reason = "Encircling blink in LOS, watch out!"
+                reason = "Encircling blink in LOS, careful!"
             },
             {
                 conditions = { check(mons, "Irradiate") },
@@ -486,24 +486,39 @@ local status = {
             },
             -- Dangerous monsters
             {
-                conditions = { mons:name() == "orb of fire", you.res_fire() < 3 },
+                conditions = { mons:name() == "orb of fire", you.res_fire() < 2 },
                 tier = 3,
-                reason = "Orb of fire and no rF+++!"
+                reason = "Orb of fire and no rF++!"
             },
             {
-                conditions = { mons:name() == "orb of winter", you.res_cold() < 3 },
+                conditions = { mons:name() == "orb of winter", you.res_cold() < 2 },
                 tier = 3,
-                reason = "Orb of winter and no rC+++!"
+                reason = "Orb of winter and no rC++!"
             },
             {
-                conditions = { mons:name() == "orb of entropy", you.res_draining() < 3 or not you.res_corr() },
+                conditions = { mons:name() == "orb of fire", you.res_fire() == 2 },
+                tier = 2,
+                reason = "Orb of fire and rF++, equip more rF?"
+            },
+            {
+                conditions = { mons:name() == "orb of winter", you.res_cold() == 2 },
+                tier = 2,
+                reason = "Orb of winter and rC++, equip more rC?"
+            },
+            {
+                conditions = { mons:name() == "orb of entropy", you.res_draining() < 2 or not you.res_corr() },
                 tier = 3,
                 reason = (function()
                     local missing = {}
-                    if you.res_draining() < 3 then table.insert(missing, "no rN+++") end
+                    if you.res_draining() < 2 then table.insert(missing, "no rN++") end
                     if not you.res_corr() then table.insert(missing, "no rCorr") end
                     return "Orb of entropy and " .. table.concat(missing, ", ") .. "!"
                 end)()
+            },
+            {
+                conditions = { mons:name() == "orb of entropy", you.res_draining() == 2 },
+                tier = 2,
+                reason = "Orb of entropy and rN++, equip more rN?"
             },
             {
                 conditions = { mons:name() == "Nikola", you.res_shock() < 1 },
