@@ -272,6 +272,52 @@ local status = {
 
         -- begin danger table
         local danger_table = {
+            -- Generic warnings
+            {
+                conditions = { mons:is_unique() == true },
+                tier = 2,
+                reason = "Unique monster, careful!"
+            },
+            {
+                conditions = { check_rare_ood(mons) },
+                tier = 2,
+                reason = "OOD monster, careful!"
+            },
+
+            -- Torment, smite, damnation, malmutation
+            {
+                -- TODO: Add a check if the spell is silencable and don't trigger if monster is silenced
+                conditions = { check(mons, "Symbol of Torment"), not you.torment_immune() },
+                tier = 3,
+                reason = "Torment and not torment immune!"
+            },
+            {
+                conditions = { check(mons, "Siphon Essence"), not you.torment_immune() },
+                tier = 3,
+                reason = "Siphon Essence (torment) and not torment immune!"
+            },
+            {
+                conditions = { check(mons, "Hurl Damnation") },
+                tier = 2,
+                reason = "Damnation in LOS, careful!"
+            },
+            {
+                conditions = { check(mons, "Call Down Damnation") },
+                tier = 2,
+                reason = "Damnation (smite) in LOS, watch out!"
+            },
+            {
+                conditions = { check(mons, "Smiting"), you.hp() < 100 },
+                tier = 2,
+                reason = "Smiter in LOS and HP below 100, watch out!"
+            },
+            {
+                conditions = { check(mons, "Malmutate") },
+                tier = 2,
+                reason = "Malmutator in LOS!"
+            },
+
+            -- Will-resistable effects
             {
                 conditions = { check_abil_pct(mons, "Paralyse") ~= nil and check_abil_pct(mons, "Paralyse") > 5 },
                 tier = 3,
@@ -293,27 +339,21 @@ local status = {
                 reason = "Sleep " .. (check_abil_pct(mons, "Sleep") or "buggy") .. "%, equip more Will?"
             },
             {
-                conditions = { check(mons, "Stunning Burst"), you.res_shock() < 1 },
-                tier = 3,
-                reason = "Stunning Burst (paralyse) and no rElec!"
-            },
-            -- TODO: Add immunity checks
-            -- Undead, nonliving, berserk and clarity provide immunity
-            {
-                conditions = { check(mons, "Dream Dust"), },
+                conditions = { check_abil_pct(mons, "Confuse") ~= nil and check_abil_pct(mons, "Confuse") > 5 },
                 tier = 2,
-                reason = "Dream Dust (" .. get_dream_dust_success_rate() .. "%), watch out!"
+                reason = "Confuse " .. (check_abil_pct(mons, "Confuse") or "buggy") .. "%, equip more Will?"
+            },
+            {
+                conditions = { check_abil_pct(mons, "Mass Confusion") ~= nil and check_abil_pct(mons, "Mass Confusion") > 5 },
+                tier = 2,
+                reason = "Mass Confusion " ..
+                    (check_abil_pct(mons, "Mass Confusion") or "buggy") .. "%, equip more Will?"
             },
             {
                 conditions = { check_abil_pct(mons, "Confusion Gaze") ~= nil and check_abil_pct(mons, "Confusion Gaze") > 5 },
                 tier = 2,
                 reason = "Confusion Gaze " ..
                     (check_abil_pct(mons, "Confusion Gaze") or "buggy") .. "%, equip more Will?"
-            },
-            {
-                conditions = { check_abil_pct(mons, "Porkalator") ~= nil and check_abil_pct(mons, "Porkalator") > 5 },
-                tier = 2,
-                reason = "Porkalator " .. (check_abil_pct(mons, "Porkalator") or "buggy") .. "%, equip more Will?"
             },
             {
                 conditions = { check_abil_pct(mons, "Slow") ~= nil and check_abil_pct(mons, "Slow") > 5 },
@@ -327,9 +367,46 @@ local status = {
                     (check_abil_pct(mons, "Sentinel's Mark") or "buggy") .. "%, equip more Will?"
             },
             {
+                conditions = { check_abil_pct(mons, "Porkalator") ~= nil and check_abil_pct(mons, "Porkalator") > 5 },
+                tier = 2,
+                reason = "Porkalator " .. (check_abil_pct(mons, "Porkalator") or "buggy") .. "%, equip more Will?"
+            },
+            {
+                conditions = { check_abil_pct(mons, "Dimension Anchor") ~= nil and check_abil_pct(mons, "Dimension Anchor") > 5 },
+                tier = 2,
+                reason = "Dimension Anchor " ..
+                    (check_abil_pct(mons, "Dimension Anchor") or "buggy") .. "%, equip more Will?"
+            },
+
+            -- Resistance checks
+            {
+                conditions = { check(mons, "Call Down Lightning"), you.res_shock() < 1 },
+                tier = 3,
+                reason = "Call Down Lightning and no rElec!"
+            },
+            {
+                conditions = { check(mons, "Spit Acid"), not you.res_corr() },
+                tier = 2,
+                reason = "Spit Acid and no rCorr!"
+            },
+            {
+                conditions = { check(mons, "Corrosive Bolt"), not you.res_corr() },
+                tier = 2,
+                reason = "Corrosive Bolt and no rCorr!"
+            },
+
+            -- Dangerous items
+            {
                 conditions = { check_tdesc(mons, "[dD]istort"), you.branch() ~= "Zig" },
                 tier = 3,
                 reason = "Distortion weapon!"
+            },
+            {
+                conditions = { check_tdesc(mons, "carrying a wand") },
+                tier = 2,
+                reason = "carrying a " ..
+                    (string.match(mons:target_desc(), "wand of %w+") or "unknown/nonexistent wand?")
+                    .. ", careful!"
             },
             {
                 conditions = { check_tdesc(mons, "quivering poison"), you.res_poison() < 1, you.branch() ~= "Zig" },
@@ -377,22 +454,42 @@ local status = {
                 tier = 2,
                 reason = "Quivering boomerangs, careful!"
             },
+
+            -- Dangerous abilities
+            {
+                conditions = { check(mons, "Stunning Burst"), you.res_shock() < 1 },
+                tier = 3,
+                reason = "Stunning Burst (paralyse) and no rElec!"
+            },
+            {
+                -- TODO: Add immunity checks
+                -- Undead, nonliving, berserk and clarity provide immunity
+                conditions = { check(mons, "Dream Dust"), },
+                tier = 2,
+                reason = "Irresistable Dream Dust (" .. get_dream_dust_success_rate() .. "%), watch out!"
+            },
+            {
+                conditions = { check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5 },
+                tier = 3,
+                reason = "Oblivion Howl " ..
+                    (check_abil_pct(mons, "Oblivion Howl") or "buggy") .. "%, equip more Will or hex it or something"
+            },
+            {
+                conditions = { check(mons, "Blink Allies Encircling") },
+                tier = 2,
+                reason = "Encircling blink in LOS, watch out!"
+            },
+            {
+                conditions = { check(mons, "Irradiate") },
+                tier = 2,
+                reason = "Irradiate, careful!"
+            },
+            -- Dangerous monsters
             {
                 conditions = { mons:name() == "orb of fire", you.res_fire() < 3 },
                 tier = 3,
                 reason = "Orb of Fire and low rF!"
             },
-            {
-                conditions = { mons:is_unique() == true },
-                tier = 2,
-                reason = "Unique monster, careful!"
-            },
-            {
-                conditions = { check_rare_ood(mons) },
-                tier = 2,
-                reason = "OOD monster, careful!"
-            },
-
             {
                 conditions = { mons:name() == "Nikola", you.res_shock() < 1 },
                 tier = 3,
@@ -402,99 +499,6 @@ local status = {
                 conditions = { mons:name() == "Nikola", check_tdesc(mons, "[sS]ilenced") ~= true and mons:status("waterlogged") ~= true },
                 tier = 3,
                 reason = "Nikola in LOS and not silenced or waterlogged!"
-            },
-
-            -- ironbound thunderhulks, lodul
-            {
-                conditions = { check(mons, "Call Down Lightning"), you.res_shock() < 1 },
-                tier = 3,
-                reason = "Call Down Lightning and no rElec!"
-            },
-
-            -- TODO: Add a check if the spell is silencable and don't trigger if monster is silenced
-            {
-                conditions = { check(mons, "Symbol of Torment"), not you.torment_immune() },
-                tier = 3,
-                reason = "Torment and not torment immune!"
-            },
-
-            {
-                conditions = { check_tdesc(mons, "carrying a wand") },
-                tier = 2,
-                reason = "carrying a " ..
-                    (string.match(mons:target_desc(), "wand of %w+") or "unknown/nonexistent wand?")
-                    .. ", careful!"
-            },
-            -- damnation checks
-            {
-                conditions = { check(mons, "Hurl Damnation") },
-                tier = 2,
-                reason = "Damnation in LOS, careful!"
-            },
-            {
-                conditions = { check(mons, "Call Down Damnation") },
-                tier = 2,
-                reason = "Damnation (smite) in LOS, watch out!"
-            },
-
-            -- by me
-            {
-                conditions = { check(mons, "Malmutate") },
-                tier = 2,
-                reason = "Malmutator in LOS!"
-            },
-            {
-                conditions = { check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5 },
-                tier = 3,
-                reason = "Oblivion Howl " ..
-                    (check_abil_pct(mons, "Oblivion Howl") or "buggy") .. "%, equip more Will or hex it or something"
-            },
-            {
-                conditions = { check_abil_pct(mons, "Confuse") ~= nil and check_abil_pct(mons, "Confuse") > 5 },
-                tier = 2,
-                reason = "Confuse " .. (check_abil_pct(mons, "Confuse") or "buggy") .. "%, equip more Will?"
-            },
-            {
-                conditions = { check_abil_pct(mons, "Mass Confusion") ~= nil and check_abil_pct(mons, "Mass Confusion") > 5 },
-                tier = 2,
-                reason = "Mass Confusion " ..
-                    (check_abil_pct(mons, "Mass Confusion") or "buggy") .. "%, equip more Will?"
-            },
-            {
-                conditions = { check(mons, "Smiting"), you.hp() < 100 },
-                tier = 2,
-                reason = "Smiter in LOS and HP below 100, watch out!"
-            },
-            {
-                conditions = { check(mons, "Blink Allies Encircling") },
-                tier = 2,
-                reason = "Encircling blink in LOS, watch out!"
-            },
-            {
-                conditions = { check_abil_pct(mons, "Dimension Anchor") ~= nil and check_abil_pct(mons, "Dimension Anchor") > 5 },
-                tier = 2,
-                reason = "Dimension Anchor " ..
-                    (check_abil_pct(mons, "Dimension Anchor") or "buggy") .. "%, equip more Will?"
-            },
-            {
-                conditions = { check(mons, "Siphon Essence"), not you.torment_immune() },
-                tier = 3,
-                reason = "Siphon Essence (torment) and not torment immune!"
-            },
-            {
-                conditions = { check(mons, "Irradiate") },
-                tier = 2,
-                reason = "Irradiate, careful!"
-            },
-            {
-                conditions = { check(mons, "Spit Acid"), not you.res_corr() },
-                tier = 2,
-                reason = "Spit Acid and no rCorr!"
-            },
-            {
-                conditions = { check(mons, "Corrosive Bolt"), not you.res_corr() },
-                tier = 2,
-                reason = "Corrosive Bolt and no rCorr!"
             }, }
 
         for _, entry in ipairs(danger_table) do
