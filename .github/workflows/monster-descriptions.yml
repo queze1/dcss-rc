@@ -1,0 +1,50 @@
+name: Collect trunk monster descriptions
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v7
+
+      - name: Check out Crawl trunk
+        uses: actions/checkout@v7
+        with:
+          repository: crawl/crawl
+          ref: master
+          path: crawl
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libncursesw5-dev liblua5.1-0-dev \
+            libsqlite3-dev libz-dev libpcre3-dev libpng-dev libfreetype6-dev
+
+      - name: Apply description dump hook
+        run: git -C crawl apply ../patches/crawl-monster-description-dump.patch
+
+      - name: Build Crawl
+        working-directory: crawl/crawl-ref/source
+        run: make -j2 TILES=0 SOUND=0 RELEASE=1 LOCALIZE=0
+
+      - name: Collect descriptions
+        working-directory: crawl/crawl-ref/source
+        env:
+          DCSS_MONSTER_DESCRIPTION_DUMP: ${{ github.workspace }}/monster-descriptions.txt
+          TERM: xterm
+        run: printf '\t' | timeout 180 script -qec './crawl -name DescriptionDump -species Human -background Fighter -seed 1' /dev/null
+
+      - name: Upload description dump
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: trunk-monster-descriptions
+          path: monster-descriptions.txt
+          if-no-files-found: error
