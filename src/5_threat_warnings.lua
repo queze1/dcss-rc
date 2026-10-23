@@ -10,7 +10,6 @@ local DEBUG_ABIL_XDY = false
 local DEBUG_ABIL_DAM = false
 local DEBUG_ABIL_PCT = false
 
-local ATT_NEUTRAL = 1
 local mons_table = {}
 local current_threats = {}
 local known_threats = {}
