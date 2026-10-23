@@ -488,7 +488,22 @@ local status = {
             {
                 conditions = { mons:name() == "orb of fire", you.res_fire() < 3 },
                 tier = 3,
-                reason = "Orb of Fire and low rF!"
+                reason = "Orb of fire and no rF+++!"
+            },
+            {
+                conditions = { mons:name() == "orb of winter", you.res_cold() < 3 },
+                tier = 3,
+                reason = "Orb of winter and no rC+++!"
+            },
+            {
+                conditions = { mons:name() == "orb of entropy", you.res_draining() < 3 or not you.res_corr() },
+                tier = 3,
+                reason = (function()
+                    local missing = {}
+                    if you.res_draining() < 3 then table.insert(missing, "no rN+++") end
+                    if not you.res_corr() then table.insert(missing, "no rCorr") end
+                    return "Orb of entropy and " .. table.concat(missing, ", ") .. "!"
+                end)()
             },
             {
                 conditions = { mons:name() == "Nikola", you.res_shock() < 1 },
