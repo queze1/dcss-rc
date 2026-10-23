@@ -17,6 +17,7 @@ function ready()
     end
 
     WarnThreats()
+    AutoExcludeSleepingUniques()
     AnnounceDamage()
 
     AutoInscribe()
