@@ -272,7 +272,6 @@ local status = {
 
         -- begin danger table
         local danger_table = {
-            -- XXX: refactor this table so i'm not duplicating logic (like check_abil_pct) in the conditions and reason fields
             {
                 conditions = { check_abil_pct(mons, "Paralyse") ~= nil and check_abil_pct(mons, "Paralyse") > 5 },
                 tier = 3,
