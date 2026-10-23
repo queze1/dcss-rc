@@ -418,19 +418,19 @@ local status = {
             {
                 conditions = { mons:name() == "Nikola", you.res_shock() < 1 },
                 tier = 3,
-                reason = "Nikola and no rElec"
+                reason = "Nikola and no rElec!"
             },
             {
                 conditions = { mons:name() == "Nikola", check_tdesc(mons, "[sS]ilenced") ~= true and mons:status("waterlogged") ~= true },
                 tier = 3,
-                reason = "Nikola in LOS and not silenced or waterlogged"
+                reason = "Nikola in LOS and not silenced or waterlogged!"
             },
 
             -- ironbound thunderhulks, lodul
             {
                 conditions = { check(mons, "Call Down Lightning"), you.res_shock() < 1 },
                 tier = 3,
-                reason = "Call Down Lightning and no rElec"
+                reason = "Call Down Lightning and no rElec!"
             },
 
             {
@@ -501,11 +501,22 @@ local status = {
                 conditions = { check(mons, "Siphon Essence"), not you.torment_immune() },
                 tier = 3,
                 reason = "Siphon Essence (torment) and not torment immune!"
+            },
+            {
+                conditions = { check(mons, "Irradiate") },
+                tier = 2,
+                reason = "Irradiate, careful!"
+            },
+            {
+                conditions = { check(mons, "Spit Acid"), you.res_corr() < 1 },
+                tier = 2,
+                reason = "Spit Acid and no rCorr!"
+            },
+            {
+                conditions = { check(mons, "Corrosive Bolt"), you.res_corr() < 1 },
+                tier = 2,
+                reason = "Corrosive Bolt and no rCorr!"
             }, }
-        -- TODO: handle radroach irradiate
-        -- TODO: handle Spit Acid and no rCorr
-        -- TODO: handle Corrosive Bolt and no rCorr
-        -- TODO: "if it's unique, and asleep, and at abs(maxlos) from 0,0", auto set an exclude
 
         for _, entry in ipairs(danger_table) do
             assert(type(entry.conditions) == "table" and type(entry.tier) == "number" and type(entry.reason) == "string")
