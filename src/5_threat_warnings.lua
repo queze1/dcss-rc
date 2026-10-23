@@ -167,13 +167,6 @@ function check_rare_ood(m)
     return mdepth > you_depth + ood_threshold and mprob < 2
 end
 
--- Returns true if this mons should be treated as threatening for warning purposes.
--- @param mons mons
--- @return bool
-function is_threatening(mons)
-    return mons:attitude() < ATT_NEUTRAL
-end
-
 -- Here we reconstruct the Dream Sheep "Dream Dust" success rate, as it's not exposed anywhere in-game.
 local DREAM_SHEEP_CAP = 6
 local DREAM_SHEEP_MAGIC_NUMBER = 25
@@ -237,7 +230,7 @@ local status = {
         for i = -LOS, LOS do
             for j = -LOS, LOS do
                 mons = monster.get_monster_at(i, j)
-                if mons and you.see_cell_no_trans(i, j) and is_threatening(mons) then
+                if mons and you.see_cell_no_trans(i, j) and is_enemy(mons) then
                     table.insert(mons_table, mons)
                 end
             end

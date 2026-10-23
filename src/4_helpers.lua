@@ -1,4 +1,7 @@
--- Helper function generating all coords in LOS
+-- 0 = hostile, 1 = neutral, 2 = strict neutral, 3 = good neutral, 4 = friendly
+local ATT_NEUTRAL = 1
+
+-- Generate all coords in LOS
 function los_coords()
     local coords = {}
     for x = -you.los(), you.los() do
@@ -9,24 +12,33 @@ function los_coords()
     return coords
 end
 
--- Helper function returning true if a hostile creature is in LOS
+-- Return true if a monster is an enemy
+function is_enemy(m)
+    return m:attitude() < ATT_NEUTRAL and not m:is_safe()
+end
+
+-- Return true if a monster is asleep
+function is_asleep(m)
+    return m:status("asleep") or m:status("dormant")
+end
+
+-- Return true if a hostile creature is in LOS
 function is_enemy_in_los()
     return util.exists(los_coords(), function(c)
         local m = monster.get_monster_at(c.x, c.y)
-        -- 0 = hostile, 1 = neutral, 2 = strict neutral, 3 = good neutral, 4 = friendly
-        return m and m:attitude() < 1 and not m:is_safe()
+        return m and is_enemy(m)
     end)
 end
 
--- Helper function returning true if an awake hostile creature is in LOS
+-- Return true if an awake hostile creature is in LOS
 function is_awake_enemy_in_los()
     return util.exists(los_coords(), function(c)
         local m = monster.get_monster_at(c.x, c.y)
-        return m and m:attitude() < 1 and not m:is_safe() and not m:status("asleep") and not m:status("dormant")
+        return m and is_enemy(m) and not is_asleep(m)
     end)
 end
 
--- Helper function which finds a message in the buffer containing a pattern
+-- Find a message in the buffer containing a pattern
 -- If a subsequent message matches the stop pattern, return nil
 function find_message(match, stop)
     local counter = 1
@@ -45,7 +57,7 @@ function find_message(match, stop)
     end
 end
 
--- Helper function returning true if you are completely rested
+-- Return true if you are completely rested
 function is_healthy()
     local hp, mhp = you.hp()
     local mp, mmp = you.mp()
@@ -59,7 +71,7 @@ function is_healthy()
     return true
 end
 
--- Helper function returning true if a feature is an upstair
+-- Return true if a feature is an upstair
 function is_upstair(feature)
     if feature == nil then
         return false
@@ -73,7 +85,7 @@ function is_upstair(feature)
     return false
 end
 
--- Helper function returning true if a feature is an downstair
+-- Return true if a feature is an downstair
 function is_downstair(feature)
     if feature == nil then
         return false
@@ -89,7 +101,7 @@ function is_downstair(feature)
     return false
 end
 
--- Helper function returning true if it's safe to autoexplore
+-- Return true if it's safe to autoexplore
 function is_safe()
     local feature = view.feature_at(0, 0)
     if is_upstair(feature) then
@@ -101,8 +113,7 @@ function is_safe()
     return hp == mhp and mp == mmp
 end
 
--- Helper function returning true if the first artefact is strictly better
--- than the second based on its properties
+-- Return true if the first artefact is strictly better than the second based on its properties
 function is_better_than_artefact(first, second)
     -- From https://github.com/crawl/crawl/blob/32f959a6b094e375b291c6452be3bc58c622a7bf/crawl-ref/source/artefact.cc#L894
     local negative_props = {
