@@ -508,12 +508,12 @@ local status = {
                 reason = "Irradiate, careful!"
             },
             {
-                conditions = { check(mons, "Spit Acid"), you.res_corr() < 1 },
+                conditions = { check(mons, "Spit Acid"), not you.res_corr() },
                 tier = 2,
                 reason = "Spit Acid and no rCorr!"
             },
             {
-                conditions = { check(mons, "Corrosive Bolt"), you.res_corr() < 1 },
+                conditions = { check(mons, "Corrosive Bolt"), not you.res_corr() },
                 tier = 2,
                 reason = "Corrosive Bolt and no rCorr!"
             }, }
