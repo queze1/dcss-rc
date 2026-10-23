@@ -391,6 +391,11 @@ local status = {
                 reason = "Call Down Lightning and no rElec!"
             },
             {
+                conditions = { check(mons, "Fireball"), you.res_fire() < 1 },
+                tier = 2,
+                reason = "Fireball and no rF!"
+            },
+            {
                 conditions = { check(mons, "Spit Acid"), not you.res_corr() },
                 tier = 2,
                 reason = "Spit Acid and no rCorr!"
