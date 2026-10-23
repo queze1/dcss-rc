@@ -367,15 +367,21 @@ local status = {
                     (check_abil_pct(mons, "Sentinel's Mark") or "buggy") .. "%, equip more Will?"
             },
             {
-                conditions = { check_abil_pct(mons, "Porkalator") ~= nil and check_abil_pct(mons, "Porkalator") > 5 },
-                tier = 2,
-                reason = "Porkalator " .. (check_abil_pct(mons, "Porkalator") or "buggy") .. "%, equip more Will?"
-            },
-            {
                 conditions = { check_abil_pct(mons, "Dimension Anchor") ~= nil and check_abil_pct(mons, "Dimension Anchor") > 5 },
                 tier = 2,
                 reason = "Dimension Anchor " ..
                     (check_abil_pct(mons, "Dimension Anchor") or "buggy") .. "%, equip more Will?"
+            },
+            {
+                conditions = { check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5 },
+                tier = 3,
+                reason = "Oblivion Howl " ..
+                    (check_abil_pct(mons, "Oblivion Howl") or "buggy") .. "%, equip more Will or hex it or something"
+            },
+            {
+                conditions = { check_abil_pct(mons, "Porkalator") ~= nil and check_abil_pct(mons, "Porkalator") > 5 },
+                tier = 2,
+                reason = "Porkalator " .. (check_abil_pct(mons, "Porkalator") or "buggy") .. "%, equip more Will?"
             },
 
             -- Resistance checks
@@ -467,12 +473,6 @@ local status = {
                 conditions = { check(mons, "Dream Dust"), },
                 tier = 2,
                 reason = "Irresistable Dream Dust (" .. get_dream_dust_success_rate() .. "%), watch out!"
-            },
-            {
-                conditions = { check_abil_pct(mons, "Oblivion Howl") ~= nil and check_abil_pct(mons, "Oblivion Howl") > 5 },
-                tier = 3,
-                reason = "Oblivion Howl " ..
-                    (check_abil_pct(mons, "Oblivion Howl") or "buggy") .. "%, equip more Will or hex it or something"
             },
             {
                 conditions = { check(mons, "Blink Allies Encircling") },
