@@ -271,13 +271,6 @@ local status = {
 
 
         -- begin danger table
-        -- TODO: Fill out the remaining danger conditions:
-        -- Need to finish adding all missing high danger monster spells,
-        -- and also check things that aren't in mons:spells(), like wands, weapons, or monster descriptions
-        -- TODO: add generic string.find(m:desc()) matching catch-all danger conditions,
-        -- to make the script resilient vs. new mons / new spells / unhandled spells
-        -- e.g. string.find(string.lower(m:desc(), "paralys"))
-        -- or string.find(m:desc(), "[pP]aralys")   ??
         local danger_table = {
             -- XXX: refactor this table so i'm not duplicating logic (like check_abil_pct) in the conditions and reason fields
             {
@@ -303,34 +296,20 @@ local status = {
             {
                 conditions = { check(mons, "Stunning Burst"), you.res_shock() < 1 },
                 tier = 3,
-                reason = "Stunning Burst (paralyse) and no rElec"
+                reason = "Stunning Burst (paralyse) and no rElec!"
             },
+            -- TODO: Add immunity checks
+            -- Undead, nonliving, berserk and clarity provide immunity
             {
-                conditions = { check(mons, "Paralysis Gaze") },
-                tier = 3,
-                reason = "Irresistible Paralysis Gaze (pierces LOF) " ..
-                    (mons:status("fully charged") ~= true and "is charging!"
-                        or "is ready to fire!!")
-            },
-            {
-                conditions = { check(mons, "Dream Dust") },
+                conditions = { check(mons, "Dream Dust"), },
                 tier = 2,
-                reason = "Irresistible Dream Dust (" .. get_dream_dust_success_rate() .. "%), watch out!"
+                reason = "Dream Dust (" .. get_dream_dust_success_rate() .. "%), watch out!"
             },
             {
                 conditions = { check_abil_pct(mons, "Confusion Gaze") ~= nil and check_abil_pct(mons, "Confusion Gaze") > 5 },
                 tier = 2,
                 reason = "Confusion Gaze " ..
                     (check_abil_pct(mons, "Confusion Gaze") or "buggy") .. "%, equip more Will?"
-            },
-            -- XXX: As far as I can tell, the only way to pull attack flavour (AF_WHATEVER) data is
-            -- through string.find(mons:desc()), this doesn't appear to be exposed anywhere else in the clua
-            -- TODO: check against the other attack flavour descriptors to see if there are more that should be handled here
-            -- https://github.com/crawl/crawl/blob/master/crawl-ref/source/describe.cc#L4292
-            {
-                conditions = { check_desc(mons, "poison and cause paralysis or slowing"), you.res_poison() < 1 },
-                tier = 3,
-                reason = "AF_POISON_PARALYSE and no rPois"
             },
             {
                 conditions = { check_abil_pct(mons, "Porkalator") ~= nil and check_abil_pct(mons, "Porkalator") > 5 },
@@ -402,7 +381,7 @@ local status = {
             {
                 conditions = { mons:name() == "orb of fire", you.res_fire() < 3 },
                 tier = 3,
-                reason = "Orb of Fire and low rF"
+                reason = "Orb of Fire and low rF!"
             },
             {
                 conditions = { mons:is_unique() == true },
@@ -433,6 +412,7 @@ local status = {
                 reason = "Call Down Lightning and no rElec!"
             },
 
+            -- TODO: Add a check if the spell is silencable and don't trigger if monster is silenced
             {
                 conditions = { check(mons, "Symbol of Torment"), not you.torment_immune() },
                 tier = 3,
