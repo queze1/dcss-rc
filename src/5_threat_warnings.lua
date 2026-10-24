@@ -489,6 +489,12 @@ local status = {
                 tier = 2,
                 reason = "Irradiate, careful!"
             },
+            {
+                -- TODO: Add immunity checks
+                conditions = { check(mons, "Miasma Breath") },
+                tier = 2,
+                reason = "Miasma Breath, careful!"
+            },
             -- Dangerous monsters
             {
                 conditions = { mons:name() == "orb of fire", you.res_fire() < 2 },
