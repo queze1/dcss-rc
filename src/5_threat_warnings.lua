@@ -396,6 +396,11 @@ local status = {
                 reason = "Fireball and no rF!"
             },
             {
+                conditions = { check(mons, "Fire Breath"), you.res_fire() < 1 },
+                tier = 2,
+                reason = "Fire Breath and no rF!"
+            },
+            {
                 conditions = { check(mons, "Spit Acid"), not you.res_corr() },
                 tier = 2,
                 reason = "Spit Acid and no rCorr!"
