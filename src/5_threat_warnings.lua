@@ -473,9 +473,7 @@ local status = {
                 reason = "Stunning Burst (paralyse) and no rElec!"
             },
             {
-                -- TODO: Add immunity checks
-                -- Undead, nonliving, berserk and clarity provide immunity
-                conditions = { check(mons, "Dream Dust"), },
+                conditions = { check(mons, "Dream Dust"), not you.immune_to_hex("Dream Dust") },
                 tier = 2,
                 reason = "Irresistable Dream Dust (" .. get_dream_dust_success_rate() .. "%), watch out!"
             },
