@@ -8,6 +8,9 @@ default_manual_training = true
 # Use old inventory layout
 show_paged_inventory = false
 
+# Increase font size when playing offline
+tile_font_msg_size = 16
+
 # Travel & resting
 travel_delay = -1
 explore_delay = -1
@@ -27,6 +30,7 @@ drop_disables_autopickup = true
 # Controls the speed of animations (default: 600)
 view_delay = 100
 
+# HP threshold to stop autofighting
 autofight_stop = 70
 
 # Minimum delay between autofight commands
@@ -43,9 +47,6 @@ unusual_monster_items += sceptre of Torment
 unusual_monster_items += vulnerable:devious:13
 unusual_monster_items += vulnerable:venom:13
 unusual_monster_items += vulnerable:electrocution:13
-
-# Increase font size when playing offline
-tile_font_msg_size = 16
 
 show_more = false
 force_more_message += into view
