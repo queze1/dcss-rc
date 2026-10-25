@@ -52,6 +52,8 @@ show_more = false
 force_more_message += into view
 force_more_message += Your unholy channel is weakening.
 force_more_message += Found a staircase to the Ecumenical Temple
+force_more_message += forbidden knowledge
+force_more_message += mollified
 
 confirm_action += Death's Door
 confirm_action += Revivification
