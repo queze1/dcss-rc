@@ -8,8 +8,9 @@ default_manual_training = true
 # Use old inventory layout
 show_paged_inventory = false
 
-# Increase font size when playing offline
+# Increase offline UI size
 tile_font_msg_size = 16
+game_scale = 2
 
 # Travel & resting
 travel_delay = -1
