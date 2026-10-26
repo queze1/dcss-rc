@@ -131,7 +131,12 @@ function SafeDownstairs()
         end
     end
 
-    if is_healthy() then
+    -- Don't warn if we cast DChan preemptively
+    local hp, mhp = you.hp()
+    local mp, mmp = you.mp()
+    local is_death_channeling_safely = you.status("death channelling") and hp == mhp and mp >= mmp - 6
+
+    if is_healthy() and not is_death_channeling_safely then
         crawl.do_commands({ "CMD_GO_DOWNSTAIRS" })
     elseif crawl.yesno("Really go downstairs while injured?") then
         crawl.do_commands({ "CMD_GO_DOWNSTAIRS" })
