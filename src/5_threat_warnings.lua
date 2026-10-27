@@ -525,7 +525,7 @@ local status = {
                 reason = "Orb of winter and rC++, equip more rC?"
             },
             {
-                conditions = { mons:name() == "orb of entropy", you.res_draining() < 2 or not you.res_corr() },
+                conditions = { mons:name() == "orb of entropy", you.res_draining() < 1 or not you.res_corr() },
                 tier = 3,
                 reason = (function()
                     local missing = {}
