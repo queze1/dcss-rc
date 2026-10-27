@@ -529,15 +529,15 @@ local status = {
                 tier = 3,
                 reason = (function()
                     local missing = {}
-                    if you.res_draining() < 2 then table.insert(missing, "no rN++") end
+                    if you.res_draining() < 1 then table.insert(missing, "no rN+") end
                     if not you.res_corr() then table.insert(missing, "no rCorr") end
                     return "Orb of entropy and " .. table.concat(missing, ", ") .. "!"
                 end)()
             },
             {
-                conditions = { mons:name() == "orb of entropy", you.res_draining() == 2 },
+                conditions = { mons:name() == "orb of entropy", you.res_draining() < 3 },
                 tier = 2,
-                reason = "Orb of entropy and rN++, equip more rN?"
+                reason = "Orb of entropy, equip more rN?"
             },
             {
                 conditions = { mons:name() == "Nikola", you.res_shock() < 1 },
