@@ -68,6 +68,7 @@ confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, 
 
 force_spell_targeter += Animate Dead
 force_spell_targeter += Blink
+force_spell_targeter += Confusing Touch
 force_spell_targeter += Silence
 force_spell_targeter += Iskenderun's Mystic Blast
 force_spell_targeter += Malign Gateway
