@@ -101,18 +101,6 @@ function is_downstair(feature)
     return false
 end
 
--- Return true if it's safe to autoexplore
-function is_safe()
-    local feature = view.feature_at(0, 0)
-    if is_upstair(feature) then
-        return true
-    end
-
-    local hp, mhp = you.hp()
-    local mp, mmp = you.mp()
-    return hp == mhp and mp == mmp
-end
-
 -- Return true if the first artefact is strictly better than the second based on its properties
 function is_better_than_artefact(first, second)
     -- From https://github.com/crawl/crawl/blob/32f959a6b094e375b291c6452be3bc58c622a7bf/crawl-ref/source/artefact.cc#L894
