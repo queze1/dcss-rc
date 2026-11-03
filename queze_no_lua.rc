@@ -55,6 +55,7 @@ unusual_monster_items += vulnerable:electrocution:13
 show_more = false
 force_more_message += into view
 force_more_message += Your unholy channel is weakening.
+force_more_message += Your blazeheart golem falls apart
 force_more_message += Found a staircase to the Ecumenical Temple
 force_more_message += forbidden knowledge
 force_more_message += mollified
