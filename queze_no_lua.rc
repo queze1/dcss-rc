@@ -25,7 +25,7 @@ travel_open_doors = true
 show_travel_trail = true
 
 # Autopickup
-autopickup = $?!+"/♦%
+autopickup = $?!+"/♦%(
 drop_disables_autopickup = true
 
 # Controls the speed of animations (default: 600)
