@@ -76,6 +76,14 @@ force_spell_targeter += Malign Gateway
 force_spell_targeter += Ozocubu's Refrigeration
 force_spell_targeter += Permafrost Eruption
 
+############################################################################
+#                            Auto Inscriptions                             #
+############################################################################
+
+ai := autoinscribe
+ai += potion of ambrosia:!q
+ai += potion of berserk rage:!q
+
 ######################################################################
 #                             Spell Slots                            #
 ######################################################################
