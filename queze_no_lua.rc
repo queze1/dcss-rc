@@ -21,7 +21,7 @@ rest_wait_both = true
 rest_wait_ancestor = true
 explore_stop += greedy_items
 travel_key_stop = false
-travel_open_doors = true
+travel_open_doors = approach
 show_travel_trail = true
 
 # Autopickup
