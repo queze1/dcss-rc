@@ -52,6 +52,11 @@ unusual_monster_items += vulnerable:devious:13
 unusual_monster_items += vulnerable:venom:13
 unusual_monster_items += vulnerable:electrocution:13
 
+# Gems
+more_gem_info = true
+always_show_gems = true
+explore_auto_rest = false
+
 show_more = false
 force_more_message += into view
 force_more_message += Your unholy channel is weakening.
