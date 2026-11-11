@@ -86,14 +86,16 @@ force_spell_targeter += Permafrost Eruption
 ############################################################################
 
 ai := autoinscribe
-ai += potion of ambrosia:!q
-ai += potion of berserk rage:!q
+
+ai += (bad|dangerous)_item.*potion:!q
+ai += (bad|dangerous)_item.*scroll:!r
+ai += potions? of berserk rage:!q
+ai += potions? of ambrosia:!q
 
 ######################################################################
 #                             Spell Slots                            #
 ######################################################################
 
-# Set Alias for Spell Slots
 slot := spell_slot
 
 slot += Fireball:f
