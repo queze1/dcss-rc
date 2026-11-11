@@ -71,7 +71,7 @@ confirm_action += Revivification
 confirm_action += Evoke Blink
 confirm_action += Rending Blade
 confirm_action += Swiftness
-confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Fiery Armour, Foxfire Swarm, Rising Flame, Channel Magic, Divine Exegesis, Finesse
+confirm_action += Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Fiery Armour, Foxfire Swarm, Rising Flame, Channel Magic, Divine Exegesis, Finesse
 
 force_spell_targeter += Animate Dead
 force_spell_targeter += Blink
