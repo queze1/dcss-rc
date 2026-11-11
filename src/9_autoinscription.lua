@@ -139,7 +139,7 @@ function AutoInscribe()
                     properties = find_item_properties(item.description or "")
                 end
 
-                if properties then
+                if next(properties) ~= nil then
                     local inscription = table.concat(properties, " ")
                     if item.inscription ~= inscription then
                         item.inscribe(inscription, false)
