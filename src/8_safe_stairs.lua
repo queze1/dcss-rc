@@ -106,24 +106,6 @@ function SafeDownstairs()
         end
     end
 
-    local s_branches = { "Shoals", "Swamp", "Snake", "Spider" }
-    local in_s_branch = util.contains(s_branches, branch)
-
-    -- Warn before entering the fourth floor of an S-branch for the first time before exploring another
-    if in_s_branch and depth == 3 and deepest_current < 4 and would_descend then
-        local explored_another_s_branch = util.exists(s_branches, function(s_branch)
-            return s_branch ~= branch
-                and (travel.find_deepest_explored(s_branch) or 0) > 0
-        end)
-
-        if not explored_another_s_branch then
-            if crawl.yesno("Really go downstairs to the last level before exploring another S-branch?") then
-                crawl.do_commands({ "CMD_GO_DOWNSTAIRS" })
-            end
-            return
-        end
-    end
-
     -- Warn before using an escape hatch
     if string.find(view.feature_at(0, 0), "escape_hatch_down") then
         if not crawl.yesno("Really use the escape hatch?") then
