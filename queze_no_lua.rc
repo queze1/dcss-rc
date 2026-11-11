@@ -44,13 +44,14 @@ hp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
 mp_colour = 100:green, 99:lightgrey, 75:yellow, 50:lightred, 25:red
 tile_show_threat_levels = tough, nasty, unusual
 
-# From rypo
+# Mostly from rypo
 unusual_monster_items += Sniper
 unusual_monster_items += dark maul
 unusual_monster_items += sceptre of Torment
 unusual_monster_items += vulnerable:devious:13
 unusual_monster_items += vulnerable:venom:13
 unusual_monster_items += vulnerable:electrocution:13
+unusual_monster_items += spectral
 
 # Gems
 # more_gem_info = true
@@ -67,10 +68,10 @@ force_more_message += mollified
 
 confirm_action += Death's Door
 confirm_action += Revivification
-confirm_action += Torment
+confirm_action += Evoke Blink
 confirm_action += Rending Blade
-confirm_action += Swiftness, Ozocubu's Armour
-confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Greater Servant of Makhleb, Lesser Servant of Makhleb, Fiery Armour, Foxfire Swarm, Rising Flame, Draw Stack, Channel Magic, Divine Exegesis, Finesse, Death's Door, Unearth Wretches, Torment
+confirm_action += Swiftness
+confirm_action += Potion Petition, Call Merchant, Bribe Branch, Heavenly Storm, Enter the Abyss, Draw Out Power, Apocalypse, Slouch, Step From Time, Summon Divine Warrior, Brothers In Arms, Fiery Armour, Foxfire Swarm, Rising Flame, Channel Magic, Divine Exegesis, Finesse
 
 force_spell_targeter += Animate Dead
 force_spell_targeter += Blink
