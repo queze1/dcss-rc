@@ -153,7 +153,6 @@ macros += M 6 ze
 macros += M 7 zf
 macros += M 8 zg
 macros += M 9 zh
-macros += M w ===FelidZE
 macros += M S ===SafeChannel
 
 # Exploration
