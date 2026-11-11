@@ -24,4 +24,5 @@ function ready()
     MarkReturnStair()
     ShoutWalkManager()
     WaitUntilWakeManager()
+    PrintSpellFailRate()
 end
