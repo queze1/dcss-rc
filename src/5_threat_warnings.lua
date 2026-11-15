@@ -324,8 +324,8 @@ local status = {
                 reason = "Paralyse " .. (check_abil_pct(mons, "Paralyse") or "buggy") .. "%, equip more Will?"
             },
             {
-                conditions = { check_abil_pct(mons, "Petrify") ~= nil and check_abil_pct(mons, "Petrify") > 5 },
-                tier = 3,
+                conditions = { check_abil_pct(mons, "Petrify") ~= nil and check_abil_pct(mons, "Petrify") > 5, not you.status("vitalised") },
+                tier = 2,
                 reason = "Petrify " .. (check_abil_pct(mons, "Petrify") or "buggy") .. "%, equip more Will?"
             },
             {
@@ -339,18 +339,18 @@ local status = {
                 reason = "Sleep " .. (check_abil_pct(mons, "Sleep") or "buggy") .. "%, equip more Will?"
             },
             {
-                conditions = { check_abil_pct(mons, "Confuse") ~= nil and check_abil_pct(mons, "Confuse") > 5 },
+                conditions = { check_abil_pct(mons, "Confuse") ~= nil and check_abil_pct(mons, "Confuse") > 5, not you.status("vitalised") },
                 tier = 2,
                 reason = "Confuse " .. (check_abil_pct(mons, "Confuse") or "buggy") .. "%, equip more Will?"
             },
             {
-                conditions = { check_abil_pct(mons, "Mass Confusion") ~= nil and check_abil_pct(mons, "Mass Confusion") > 5 },
+                conditions = { check_abil_pct(mons, "Mass Confusion") ~= nil and check_abil_pct(mons, "Mass Confusion") > 5, not you.status("vitalised") },
                 tier = 2,
                 reason = "Mass Confusion " ..
                     (check_abil_pct(mons, "Mass Confusion") or "buggy") .. "%, equip more Will?"
             },
             {
-                conditions = { check_abil_pct(mons, "Confusion Gaze") ~= nil and check_abil_pct(mons, "Confusion Gaze") > 5 },
+                conditions = { check_abil_pct(mons, "Confusion Gaze") ~= nil and check_abil_pct(mons, "Confusion Gaze") > 5, not you.status("vitalised") },
                 tier = 2,
                 reason = "Confusion Gaze " ..
                     (check_abil_pct(mons, "Confusion Gaze") or "buggy") .. "%, equip more Will?"
@@ -362,7 +362,7 @@ local status = {
             },
             {
                 conditions = { check_abil_pct(mons, "Sentinel's Mark") ~= nil and check_abil_pct(mons, "Sentinel's Mark") > 5 },
-                tier = 3,
+                tier = 2,
                 reason = "Sentinel's Mark " ..
                     (check_abil_pct(mons, "Sentinel's Mark") or "buggy") .. "%, equip more Will?"
             },
@@ -387,7 +387,7 @@ local status = {
             -- Resistance checks
             {
                 conditions = { check(mons, "Call Down Lightning"), you.res_shock() < 1 },
-                tier = 3,
+                tier = 2,
                 reason = "Call Down Lightning and no rElec!"
             },
             {
@@ -404,6 +404,11 @@ local status = {
                 conditions = { check(mons, "Eruption"), you.res_fire() < 1 },
                 tier = 3,
                 reason = "Eruption and no rF!"
+            },
+            {
+                conditions = { check(mons, "Eruption"), you.res_fire() < 2 },
+                tier = 2,
+                reason = "Eruption and rF+, careful!"
             },
             {
                 conditions = { check(mons, "Spit Acid"), not you.res_corr() },
