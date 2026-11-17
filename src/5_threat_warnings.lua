@@ -339,6 +339,11 @@ local status = {
                 reason = "Sleep " .. (check_abil_pct(mons, "Sleep") or "buggy") .. "%, equip more Will?"
             },
             {
+                conditions = { check_abil_pct(mons, "Siren Song") ~= nil and check_abil_pct(mons, "Siren Song") > 5 },
+                tier = 2,
+                reason = "Siren Song " .. (check_abil_pct(mons, "Siren Song") or "buggy") .. "%, equip more Will?"
+            },
+            {
                 conditions = { check_abil_pct(mons, "Confuse") ~= nil and check_abil_pct(mons, "Confuse") > 5, not you.status("vitalised") },
                 tier = 2,
                 reason = "Confuse " .. (check_abil_pct(mons, "Confuse") or "buggy") .. "%, equip more Will?"
