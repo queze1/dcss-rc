@@ -397,8 +397,13 @@ local status = {
             },
             {
                 conditions = { check(mons, "Fireball"), you.res_fire() < 1 },
-                tier = 2,
+                tier = 3,
                 reason = "Fireball and no rF!"
+            },
+            {
+                conditions = { check(mons, "Fireball"), you.res_fire() < 2 },
+                tier = 2,
+                reason = "Fireball and rF+, careful!"
             },
             {
                 conditions = { check(mons, "Fire Breath"), you.res_fire() < 1 },
@@ -466,7 +471,7 @@ local status = {
             },
             {
                 conditions = { check_tdesc(mons, "throwing net"), you.branch() ~= "Zig" },
-                tier = 3,
+                tier = 2,
                 reason = "Quivering throwing nets, watch out!"
             },
             -- TODO: branded javelins (silver), branded large rocks (chuck)
