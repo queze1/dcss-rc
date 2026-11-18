@@ -16,13 +16,13 @@ function ready()
         crawl.sendkeys("m")
     end
 
-    WarnThreats()
-    AutoExcludeSleepingUniques()
     AnnounceDamage()
-
+    AutoExcludeSleepingUniques()
     AutoInscribe()
     MarkReturnStair()
+    PrintSpellFailRate()
+    ShoalsCheck()
     ShoutWalkManager()
     WaitUntilWakeManager()
-    PrintSpellFailRate()
+    WarnThreats()
 end
