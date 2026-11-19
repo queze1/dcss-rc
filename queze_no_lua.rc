@@ -31,7 +31,7 @@ drop_disables_autopickup = true
 view_delay = 100
 
 # HP threshold to stop autofighting
-autofight_stop = 70
+autofight_stop = 60
 
 # Minimum delay between autofight commands
 autofight_warning = 200
