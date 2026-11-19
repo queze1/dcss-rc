@@ -36,6 +36,9 @@ autofight_stop = 60
 # Minimum delay between autofight commands
 autofight_warning = 200
 
+# Wait for a turn when not in melee range
+autofight_wait = true
+
 # Don't warn when casting dangerous spells
 fail_severity_to_confirm = 0
 
