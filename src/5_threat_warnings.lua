@@ -401,7 +401,7 @@ local status = {
                 reason = "Fireball and no rF!"
             },
             {
-                conditions = { check(mons, "Fireball"), you.res_fire() < 2 },
+                conditions = { check(mons, "Fireball"), you.res_fire() == 1 },
                 tier = 2,
                 reason = "Fireball and rF+, careful!"
             },
@@ -416,7 +416,7 @@ local status = {
                 reason = "Eruption and no rF!"
             },
             {
-                conditions = { check(mons, "Eruption"), you.res_fire() < 2 },
+                conditions = { check(mons, "Eruption"), you.res_fire() == 1 },
                 tier = 2,
                 reason = "Eruption and rF+, careful!"
             },
