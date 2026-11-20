@@ -141,7 +141,8 @@ function AutoInscribe()
 
                 if properties ~= nil and next(properties) ~= nil then
                     local inscription = table.concat(properties, " ")
-                    if item.inscription ~= inscription then
+                    -- Don't overwrite existing inscriptions
+                    if item.inscription == "" then
                         item.inscribe(inscription, false)
                     end
                 end
