@@ -324,8 +324,9 @@ local status = {
                 reason = "Paralyse " .. (check_abil_pct(mons, "Paralyse") or "buggy") .. "%, equip more Will?"
             },
             {
+                -- Downgrade to T2 if in Lair to prevent constant screen flashes around Basilisks
                 conditions = { check_abil_pct(mons, "Petrify") ~= nil and check_abil_pct(mons, "Petrify") > 5, not you.status("vitalised") },
-                tier = 2,
+                tier = you.branch() == "Lair" and 2 or 3,
                 reason = "Petrify " .. (check_abil_pct(mons, "Petrify") or "buggy") .. "%, equip more Will?"
             },
             {
